@@ -76,7 +76,7 @@ run "ember new #{ember_app}"
 run "rm -rf #{ember_app}/.git/"
 
 # Download the most recent gitignore file
-run "curl -o /.gitignore 'https://raw.githubusercontent.com/inigo-llc/ember-cli-rails/master/gitignore_template'"
+run "curl -o .gitignore 'https://raw.githubusercontent.com/inigo-llc/ember-cli-rails/master/gitignore_template'"
 
 create_file '.nvmrc' do
   '0.10.32'
