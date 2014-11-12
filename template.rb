@@ -17,7 +17,7 @@ gem 'pg'
 gem 'squeel'
 
 # Install production gems
-gem_group :production do 
+gem_group :production do
   gem 'rails_12factor'
 end
 
@@ -39,6 +39,11 @@ run "sed -i.bak '/sqlite3/d' Gemfile"
 run "sed -i.bak '/sass-rails/d' Gemfile"
 run "sed -i.bak '/uglifier/d' Gemfile"
 
+# Keep before bundle install
+create_file '.ruby-version' do
+  "2.1.4"
+end
+
 # Install gems using bundler
 run "bundle install"
 
@@ -53,20 +58,16 @@ class EmberApplicationController < ApplicationController
 end
 FILE
 
-# gsub_file 'app/config/routes.rb', /  #.*\n/, ''
+# Remove Comments and empty lines
+gsub_file 'config/routes.rb', /^(  #.*\n)|(\n)/, ''
+inject_into_file 'config/routes.rb', after: 'do' do
+  "\n"
+end
 
 route "get '(*path)', to: 'ember_application#index'"
 route "# Clobbers all routes, Keep this as the last route in the routes file"
-inject_into_file 'app/config/routes.rb',
-                 before: '# Clobbers all routes, Keep this as the last route in the routes file' do
-  "\n\n"
-end
 
-create_file '.ruby-version' do
-  "2.1.4"
-end
-
-ember_app = "#{@app_name}-ember"
+ember_app = "app-ember"
 
 # create ember-cli app
 run "ember new #{ember_app}"
@@ -114,10 +115,10 @@ rakefile("build.rake") do
   <<-TASK
 namespace :ember do
   task :build do
-    Dir.chdir(#{ember_app}) do
+    Dir.chdir('#{ember_app}') do
       sh './node_modules/.bin/ember build --environment=production'
     end
-    
+
     sh 'mv public/ public.bak/'
     sh 'mkdir public/'
     sh 'cp -r #{ember_app}/dist/ public/'
@@ -126,34 +127,36 @@ end
   TASK
 end
 
-if yes?("Use CSRF in Ember?")
-  route "get :csrf, to: 'csrf#index'"
-  
-  file "app/controllers/api/csrf_controller.rb", <<-FILE
-class Api::CsrfController < ApplicationController
-  def index
-    render json: { request_forgery_protection_token => form_authenticity_token }.to_json
-  end
+route "get :csrf, to: 'csrf#index'"
+inject_into_file 'config/routes.rb',
+                 before: '  # Clobbers all routes, Keep this as the last route in the routes file' do
+  "\n\n"
 end
-  FILE
-  
-  inside "#{ember_app}" do
-    run 'npm install rails-csrf --save-dev'
-  end
-  
-  file "#{ember_app}/app/routes/application.js", <<-FILE
+
+file "app/controllers/api/csrf_controller.rb", <<-FILE
+class Api::CsrfController < ApplicationController
+def index
+  render json: { request_forgery_protection_token => form_authenticity_token }.to_json
+end
+end
+FILE
+
+inside "#{ember_app}" do
+  run 'npm install rails-csrf --save-dev'
+end
+
+file "#{ember_app}/app/routes/application.js", <<-FILE
 import Ember from 'ember';
 
 export default Ember.Route.extend({
-  beforeModel: function() {
-    return this.csrf.fetchToken();
-  }
+beforeModel: function() {
+  return this.csrf.fetchToken();
+}
 });
-  FILE
-  
-  inject_into_file "#{ember_app}/app/app.js", after: "loadInitializers(App, config.modulePrefix);" do
-    "loadInitializers(App, 'rails-csrf');"
-  end
+FILE
+
+inject_into_file "#{ember_app}/app/app.js", after: "loadInitializers(App, config.modulePrefix);" do
+  "\nloadInitializers(App, 'rails-csrf');"
 end
 
 puts <<-MESSAGE
