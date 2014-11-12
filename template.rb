@@ -14,7 +14,6 @@ action_messages = []
 
 # Install required gems
 gem 'api_me'
-gem 'pg'
 gem 'squeel'
 
 # Install production gems
