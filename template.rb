@@ -66,9 +66,9 @@ ember_app = "#{@app_name}-ember"
 # create ember-cli app
 run "ember new #{ember_app}"
 
-create_file ".nvmrc" do
-  "0.10.32"
-end
+# create_file ".nvmrc" do
+#   "0.10.32"
+# end
 
 # Create the file that sets the default ember serve options (like the proxy)
 file "#{ember_app}/.ember-cli", <<-FILE
