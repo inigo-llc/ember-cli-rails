@@ -8,20 +8,14 @@ building and testing your rails app.
 
 ## Dependencies
 
-You will need the usual dev setup ruby, rails, bundler, node && npm. Once you
-have those, you will also need `bower` and `ember-cli`
-
-install `bower` via npm
-
-```bash
-$ npm install -g bower
-```
-
-install `ember-cli` via npm
-
-```bash
-$ npm install -g ember-cli
-```
+You will need the usual [development setup](https://github.com/inigo-llc/guides#setting-up-your-development-enviroment): 
+- ruby
+  - bundler
+  - rails
+- node
+  - npm
+  - bower
+  - ember-cli
 
 ## Usage
 
