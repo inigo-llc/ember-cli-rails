@@ -96,7 +96,7 @@ puts dot_ember_cli
 puts "***\n"
 
 # Create the file that sets the default ember serve options (like the proxy)
-# file "#{ember-app}/.ember-cli", dot_ember_cli
+file "#{ember-app}/.ember-cli", dot_ember_cli
 
 # Setup smartcd to prepend  ./node_modules/.bin to our path when we enter the ember application folder
 # create_file "#{ember-app}/.bash_enter" do
