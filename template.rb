@@ -64,9 +64,9 @@ ember_app = "#{@app_name}-ember"
 # create ember-cli app
 run "ember new #{ember_app}"
 
-create_file ".nvmrc" do
-  "0.10.32"
-end
+# create_file ".nvmrc" do
+#   "0.10.32"
+# end
 
 # Create the file that sets the default ember serve options (like the proxy)
 # create_file "#{ember-app}/.ember-cli" do
@@ -85,25 +85,25 @@ end
 # end
 
 # Setup smartcd to prepend  ./node_modules/.bin to our path when we enter the ember application folder
-create_file "#{ember-app}/.bash_enter" do
-  <<-FILE
-########################################################################
-# smartcd enter
-#
-# This is a smartcd script.  Commands you type will be run when you
-# enter this directory.  The string __PATH__ will be replaced with
-# the current path.  Some examples are editing your $PATH or creating
-# a temporary alias:
-#
-#     autostash PATH=__PATH__/bin:$PATH
-#     autostash alias restart="service stop; sleep 1; service start"
-#
-# See http://smartcd.org for more ideas about what can be put here
-########################################################################
+# create_file "#{ember-app}/.bash_enter" do
+#   <<-FILE
+# ########################################################################
+# # smartcd enter
+# #
+# # This is a smartcd script.  Commands you type will be run when you
+# # enter this directory.  The string __PATH__ will be replaced with
+# # the current path.  Some examples are editing your $PATH or creating
+# # a temporary alias:
+# #
+# #     autostash PATH=__PATH__/bin:$PATH
+# #     autostash alias restart="service stop; sleep 1; service start"
+# #
+# # See http://smartcd.org for more ideas about what can be put here
+# ########################################################################
 
-autostash PATH=__PATH__/node_modules/.bin:$PATH
-  FILE
-end
+# autostash PATH=__PATH__/node_modules/.bin:$PATH
+#   FILE
+# end
 
 rakefile("build.rake") do
   <<-TASK
