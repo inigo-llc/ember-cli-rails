@@ -41,16 +41,16 @@ run "sed -i.bak '/uglifier/d' Gemfile"
 
 # Keep before bundle install
 create_file '.ruby-version' do
-  "2.1.4"
+  '2.1.4'
 end
 
 # Install gems using bundler
-run "bundle install"
+run 'bundle install'
 
 # cleanup
-run "rm Gemfile.bak"
+run 'rm Gemfile.bak'
 
-file "app/controllers/ember_application_controller.rb", <<-FILE
+file 'app/controllers/ember_application_controller.rb', <<-FILE
 class EmberApplicationController < ApplicationController
   def index
     render file: 'public/index.html'
@@ -65,15 +65,21 @@ inject_into_file 'config/routes.rb', after: 'do' do
 end
 
 route "get '(*path)', to: 'ember_application#index'"
-route "# Clobbers all routes, Keep this as the last route in the routes file"
+route '# Clobbers all routes, Keep this as the last route in the routes file'
 
-ember_app = "app-ember"
+ember_app = 'app-ember'
 
 # create ember-cli app
 run "ember new #{ember_app}"
 
-create_file ".nvmrc" do
-  "0.10.32"
+# Remove the sub-git project created
+run "rm -rf #{ember_app}/.git/"
+
+# Download the most recent gitignore file
+run "curl -o /.gitignore 'https://raw.githubusercontent.com/inigo-llc/ember-cli-rails/master/gitignore_template'"
+
+create_file '.nvmrc' do
+  '0.10.32'
 end
 
 run "rm #{ember_app}/.ember-cli"
@@ -111,7 +117,7 @@ file "#{ember_app}/.bash_enter", <<-FILE
 autostash PATH=__PATH__/node_modules/.bin:$PATH
 FILE
 
-rakefile("build.rake") do
+rakefile('build.rake') do
   <<-TASK
 namespace :ember do
   task :build do
@@ -133,7 +139,7 @@ inject_into_file 'config/routes.rb',
   "\n\n"
 end
 
-file "app/controllers/api/csrf_controller.rb", <<-FILE
+file 'app/controllers/api/csrf_controller.rb', <<-FILE
 class Api::CsrfController < ApplicationController
 def index
   render json: { request_forgery_protection_token => form_authenticity_token }.to_json
@@ -155,9 +161,12 @@ beforeModel: function() {
 });
 FILE
 
-inject_into_file "#{ember_app}/app/app.js", after: "loadInitializers(App, config.modulePrefix);" do
+inject_into_file "#{ember_app}/app/app.js", after: 'loadInitializers(App, config.modulePrefix);' do
   "\nloadInitializers(App, 'rails-csrf');"
 end
+
+# Initialize git repo
+run 'git init'
 
 puts <<-MESSAGE
 
@@ -180,7 +189,7 @@ Actions:
 MESSAGE
 
 action_messages.each do |message|
-  puts "**************"
+  puts '**************'
   puts message
-  puts "**************"
+  puts '**************'
 end
