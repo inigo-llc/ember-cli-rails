@@ -57,7 +57,7 @@ FILE
 
 route "get '(*path)', to: 'ember_application#index'"
 route "# Clobbers all routes, Keep this as the last route in the routes file"
-inject_info_file 'app/config/routes.rb',
+inject_into_file 'app/config/routes.rb',
                  before: '# Clobbers all routes, Keep this as the last route in the routes file' do
   "\n\n"
 end
