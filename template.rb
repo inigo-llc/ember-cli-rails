@@ -59,8 +59,11 @@ class Api::CsrfController < ApplicationController
 end
 FILE
 
+route "get '(*path)', to: 'ember_application#index'"
+route "# Clobbers all routes, Keep this as the last route in the routes file"
+route ""
 route "get :csrf, to: 'csrf#index'"
-route "get '(*path)', to: 'ember_application#index' # Clobbers all routes, Keep this as the last route in the routes file"
+
 
 create_file ".ruby-version" do
   "2.1.4"
@@ -76,18 +79,18 @@ create_file ".nvmrc" do
 end
 
 # Create the file that sets the default ember serve options (like the proxy)
-file "#{ember-app}/.ember-cli", <<-FILE
-{
-  /**
-    Ember CLI sends analytics information by default. The data is completely
-    anonymous, but there are times when you might want to disable this behavior.
+# file "#{ember-app}/.ember-cli", <<-FILE
+# {
+#   /**
+#     Ember CLI sends analytics information by default. The data is completely
+#     anonymous, but there are times when you might want to disable this behavior.
 
-    Setting `disableAnalytics` to true will prevent any data from being sent.
-  */
-  "disableAnalytics": false,
-  "proxy": "http://localhost:3000"
-}
-FILE
+#     Setting `disableAnalytics` to true will prevent any data from being sent.
+#   */
+#   "disableAnalytics": false,
+#   "proxy": "http://localhost:3000"
+# }
+# FILE
 
 # Setup smartcd to prepend  ./node_modules/.bin to our path when we enter the ember application folder
 # create_file "#{ember-app}/.bash_enter" do
