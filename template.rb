@@ -5,21 +5,39 @@
 # For more information about the template API, see:
 #    http://edgeguides.rubyonrails.org/rails_application_templates.html
 #
-# this template assumes:
+# This template assumes you have followed the setup guide at:
+# https://github.com/inigo-llc/guides/#setting-up-your-development-enviroment
 #
-# npm installed
-# npm install -g bower
-# npm install -g ember-cli
 
 # Install required gems
-gem "active_model_serializers"
+gem 'api_me'
+gem 'pg'
+gem 'squeel'
+
+# Install production gems
+gem_group :production do 
+  gem 'rails_12factor'
+end
+
+# Install development and test gems
+gem_group :development, :test do
+  gem 'annotate'
+  gem 'brakeman'
+  gem 'factory_girl_rails'
+  gem 'rspec-rails'
+  gem 'rubocop'
+end
 
 # kill un-needed gems
 run "sed -i.bck '/turbolinks/d' Gemfile"
 run "sed -i.bck '/coffee/d' Gemfile"
 run "sed -i.bck '/jbuilder/d' Gemfile"
 run "sed -i.bck '/jquery-rails/d' Gemfile"
+run "sed -i.bck '/sqlite3/d' Gemfile"
+run "sed -i.bck '/sass-rails/d' Gemfile"
+run "sed -i.bck '/uglifier/d' Gemfile"
 
+# Install gems using bundler
 run "bundle install"
 
 # cleanup
@@ -29,27 +47,16 @@ ember_app = "#{@app_name}-ember"
 
 # create ember-cli app
 run "ember new #{ember_app}"
-run "cd #{ember_app} && npm link ember-cli"
 
-#don't track node_modules via git
-run "echo '/#{ember_app}/node_modules/*' >> .gitignore"
-
-# build rails catch-all route
-route "get '*path' => redirect('/')"
-
-generate :serializer, "application", "--parent", "ActiveModel::Serializer"
-inject_into_class "app/serializers/application_serializer.rb", "ApplicationSerializer" do
-  "  embed :ids, :include => true\n"
+inject_into_class "app/controllers/ember_application_controller.rb" do
+<<-FILE
+class EmberApplicationController < ApplicationController
+  def index
+    render file: 'public/index.html'
+  end
 end
-
-#create build.sh from template put in bin/
-template_dir = File.expand_path(File.dirname(__FILE__))
-build_file_path = template_dir + "/build.sh.erb"
-template = File.open(build_file_path, "rb") {|io| io.read}
-
-build_content = ERB.new(template).result(binding)
-File.open('bin/build.sh', 'w') { |file| file.write(build_content) }
-run "chmod a+x bin/build.sh"
+FILE
+end
 
 puts <<-MESSAGE
 
