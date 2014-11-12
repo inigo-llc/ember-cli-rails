@@ -95,6 +95,8 @@ puts "\n***\n.ember-cli:"
 puts dot_ember_cli
 puts "***\n"
 
+puts "path: #{ember-app}/.ember-cli"
+
 # Create the file that sets the default ember serve options (like the proxy)
 file "#{ember-app}/.ember-cli", dot_ember_cli
 
