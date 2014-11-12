@@ -29,33 +29,59 @@ gem_group :development, :test do
 end
 
 # kill un-needed gems
-run "sed -i.bck '/turbolinks/d' Gemfile"
-run "sed -i.bck '/coffee/d' Gemfile"
-run "sed -i.bck '/jbuilder/d' Gemfile"
-run "sed -i.bck '/jquery-rails/d' Gemfile"
-run "sed -i.bck '/sqlite3/d' Gemfile"
-run "sed -i.bck '/sass-rails/d' Gemfile"
-run "sed -i.bck '/uglifier/d' Gemfile"
+run "sed -i.bak '/turbolinks/d' Gemfile"
+run "sed -i.bak '/coffee/d' Gemfile"
+run "sed -i.bak '/jbuilder/d' Gemfile"
+run "sed -i.bak '/jquery-rails/d' Gemfile"
+run "sed -i.bak '/sqlite3/d' Gemfile"
+run "sed -i.bak '/sass-rails/d' Gemfile"
+run "sed -i.bak '/uglifier/d' Gemfile"
 
 # Install gems using bundler
 run "bundle install"
 
 # cleanup
-run "rm Gemfile.bck"
+run "rm Gemfile.bak"
+
+create_file "app/controllers/ember_application_controller.rb" do
+  <<-FILE
+    class EmberApplicationController < ApplicationController
+      def index
+        render file: 'public/index.html'
+      end
+    end
+  FILE
+end
+
+route "get '(*path)', to: 'ember_application#index'"
+
+create_file ".ruby-version" do
+  "2.1.4"
+end
 
 ember_app = "#{@app_name}-ember"
 
 # create ember-cli app
 run "ember new #{ember_app}"
 
-inject_into_class "app/controllers/ember_application_controller.rb" do
-<<-FILE
-class EmberApplicationController < ApplicationController
-  def index
-    render file: 'public/index.html'
-  end
+create_file ".nvmrc" do
+  "0.10.32"
 end
-FILE
+
+rakefile("build.rake") do
+  <<-TASK
+    namespace :ember do
+      task :build do
+        Dir.chdir(#{ember_app}) do
+          sh './node_modules/.bin/ember build --environment=production'
+        end
+        
+        sh 'mv public/ public.bak/'
+        sh 'mkdir public/'
+        sh 'cp -r #{ember_app}/dist/ public/'
+      end
+    end
+  TASK
 end
 
 puts <<-MESSAGE
@@ -67,7 +93,7 @@ see: https://github.com/stefanpenner/ember-cli
 
 To build the ember project for deployment run
 
-`./bin/build.sh`
+`rake ember:build`
 
 ***********************************************************
 
