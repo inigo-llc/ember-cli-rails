@@ -9,6 +9,8 @@
 # https://github.com/inigo-llc/guides/#setting-up-your-development-enviroment
 #
 
+action_messages = []
+
 # Install required gems
 gem 'api_me'
 gem 'pg'
@@ -51,19 +53,9 @@ class EmberApplicationController < ApplicationController
 end
 FILE
 
-file "app/controllers/api/csrf_controller.rb", <<-FILE
-class Api::CsrfController < ApplicationController
-  def index
-    render json: { request_forgery_protection_token => form_authenticity_token }.to_json
-  end
-end
-FILE
-
 route "get '(*path)', to: 'ember_application#index'"
 route "# Clobbers all routes, Keep this as the last route in the routes file"
 route ""
-route "get :csrf, to: 'csrf#index'"
-
 
 create_file ".ruby-version" do
   "2.1.4"
@@ -127,6 +119,40 @@ end
   TASK
 end
 
+if yes?("Use CSRF in Ember?")
+  route "get :csrf, to: 'csrf#index'"
+  
+  file "app/controllers/api/csrf_controller.rb", <<-FILE
+class Api::CsrfController < ApplicationController
+  def index
+    render json: { request_forgery_protection_token => form_authenticity_token }.to_json
+  end
+end
+  FILE
+  
+  inside "#{ember_app}" do
+    run 'npm install rails-csrf --save-dev'
+  end
+  
+  file "#{ember_app}/app/routes/application.js", <<-FILE
+import Ember from 'ember';
+
+export default Ember.Route.extend({
+  beforeModel: function() {
+    return this.csrf.fetchToken();
+  }
+});
+  FILE
+  
+  action_messages << <<-MESSAGE
+Please add:
+
+loadInitializers(App, 'rails-csrf');
+
+to the #{ember_app}/app/app.js file.
+  MESSAGE
+end
+
 puts <<-MESSAGE
 
 ***********************************************************
@@ -141,3 +167,14 @@ To build the ember project for deployment run
 ***********************************************************
 
 MESSAGE
+
+puts <<-MESSAGE
+***********************************************************
+Actions:
+MESSAGE
+
+action_messages.each do |message|
+  puts "**************"
+  puts message
+  puts "**************"
+end
