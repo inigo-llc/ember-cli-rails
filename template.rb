@@ -53,16 +53,16 @@ class EmberApplicationController < ApplicationController
 end
 FILE
 
-gsub_file /  #.*\n/g, ''
+gsub_file 'app/config/routes.rb', /  #.*\n/g, ''
 
 route "get '(*path)', to: 'ember_application#index'"
 route "# Clobbers all routes, Keep this as the last route in the routes file"
-inject_info_file "app/config/routes.rb",
-                 before: "# Clobbers all routes, Keep this as the last route in the routes file" do
+inject_info_file 'app/config/routes.rb',
+                 before: '# Clobbers all routes, Keep this as the last route in the routes file' do
   "\n\n"
 end
 
-create_file ".ruby-version" do
+create_file '.ruby-version' do
   "2.1.4"
 end
 
