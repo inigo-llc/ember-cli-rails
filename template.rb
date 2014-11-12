@@ -53,7 +53,7 @@ class EmberApplicationController < ApplicationController
 end
 FILE
 
-gsub_file 'app/config/routes.rb', /  #.*\n/g, ''
+gsub_file 'app/config/routes.rb', /  #.*\n/, ''
 
 route "get '(*path)', to: 'ember_application#index'"
 route "# Clobbers all routes, Keep this as the last route in the routes file"
