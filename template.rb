@@ -69,20 +69,20 @@ create_file ".nvmrc" do
 end
 
 # Create the file that sets the default ember serve options (like the proxy)
-# create_file "#{ember-app}/.ember-cli" do
-#   <<-FILE
-# {
-#   /**
-#     Ember CLI sends analytics information by default. The data is completely
-#     anonymous, but there are times when you might want to disable this behavior.
+create_file "#{ember-app}/.ember-cli" do
+  <<-FILE
+{
+  /**
+    Ember CLI sends analytics information by default. The data is completely
+    anonymous, but there are times when you might want to disable this behavior.
 
-#     Setting `disableAnalytics` to true will prevent any data from being sent.
-#   */
-#   "disableAnalytics": false,
-#   "proxy": "http://localhost:3000"
-# }
-#   FILE
-# end
+    Setting `disableAnalytics` to true will prevent any data from being sent.
+  */
+  "disableAnalytics": false,
+  "proxy": "http://localhost:3000"
+}
+  FILE
+end
 
 # Setup smartcd to prepend  ./node_modules/.bin to our path when we enter the ember application folder
 # create_file "#{ember-app}/.bash_enter" do
