@@ -25,20 +25,9 @@ $ npm install -g ember-cli
 
 ## Usage
 
-clone the repo
-
 ```bash
-$ git clone git@github.com:knomedia/ember-cli-rails.git
+$ rails new <app-name> -m https://raw.githubusercontent.com/inigo-llc/ember-cli-rails/master/template.rb
 ```
-
-Assuming you are in the same directory as the `ember-cli-rails` repo, create a
-new rails app like:
-
-```bash
-$ rails new app -m ember-cli-rails/template.rb
-```
-
-If you are in another location, change the path to the template file as needed.
 
 You now have a rails project with an ember-cli project within it.
 
@@ -60,7 +49,7 @@ labled with your app-name-ember). From within the ember-app directory run the
 development ember server
 
 ```bash
-$ ember serve --proxy http://localhost:3000
+$ npm start
 ```
 
 This will proxy api calls to your rails backend. For more information see the 
@@ -72,7 +61,7 @@ This will proxy api calls to your rails backend. For more information see the
 From time to time, or whenever time to deploy, cd to your rails root and run:
 
 ```bash
-$ ./bin/build.sh
+$ rake ember:build
 ```
 
 This will utilize `ember-cli` to build your ember app, and copy files over to 
