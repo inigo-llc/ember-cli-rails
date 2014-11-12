@@ -78,7 +78,8 @@ create_file ".nvmrc" do
   "0.10.32"
 end
 
-dot_ember_cli = <<-FILE
+# Create the file that sets the default ember serve options (like the proxy)
+file "#{ember_app}/.ember-cli", <<-FILE
 {
   /**
     Ember CLI sends analytics information by default. The data is completely
@@ -91,36 +92,24 @@ dot_ember_cli = <<-FILE
 }
 FILE
 
-puts "\n***\n.ember-cli:"
-puts dot_ember_cli
-puts "***\n"
-
-puts "ember-app: #{ember-app}"
-puts "path: #{ember-app}/.ember-cli"
-
-# Create the file that sets the default ember serve options (like the proxy)
-file "#{ember-app}/.ember-cli", dot_ember_cli
-
 # Setup smartcd to prepend  ./node_modules/.bin to our path when we enter the ember application folder
-# create_file "#{ember-app}/.bash_enter" do
-#   <<-FILE
-# ########################################################################
-# # smartcd enter
-# #
-# # This is a smartcd script.  Commands you type will be run when you
-# # enter this directory.  The string __PATH__ will be replaced with
-# # the current path.  Some examples are editing your $PATH or creating
-# # a temporary alias:
-# #
-# #     autostash PATH=__PATH__/bin:$PATH
-# #     autostash alias restart="service stop; sleep 1; service start"
-# #
-# # See http://smartcd.org for more ideas about what can be put here
-# ########################################################################
+file "#{ember_app}/.bash_enter", <<-FILE
+########################################################################
+# smartcd enter
+#
+# This is a smartcd script.  Commands you type will be run when you
+# enter this directory.  The string __PATH__ will be replaced with
+# the current path.  Some examples are editing your $PATH or creating
+# a temporary alias:
+#
+#     autostash PATH=__PATH__/bin:$PATH
+#     autostash alias restart="service stop; sleep 1; service start"
+#
+# See http://smartcd.org for more ideas about what can be put here
+########################################################################
 
-# autostash PATH=__PATH__/node_modules/.bin:$PATH
-#   FILE
-# end
+autostash PATH=__PATH__/node_modules/.bin:$PATH
+FILE
 
 rakefile("build.rake") do
   <<-TASK
