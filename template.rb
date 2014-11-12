@@ -8,7 +8,8 @@
 # This template assumes you have followed the setup guide at:
 # https://github.com/inigo-llc/guides/#setting-up-your-development-enviroment
 #
-
+ruby_version = '2.1.4'
+node_version = '0.10.32'
 action_messages = []
 
 # Install required gems
@@ -41,7 +42,7 @@ run "sed -i.bak '/uglifier/d' Gemfile"
 
 # Keep before bundle install
 create_file '.ruby-version' do
-  '2.1.4'
+  ruby_version
 end
 
 # Install gems using bundler
@@ -75,11 +76,8 @@ run "ember new #{ember_app}"
 # Remove the sub-git project created
 run "rm -rf #{ember_app}/.git/"
 
-# Download the most recent gitignore file
-run "curl -o .gitignore 'https://raw.githubusercontent.com/inigo-llc/ember-cli-rails/master/gitignore_template'"
-
 create_file '.nvmrc' do
-  '0.10.32'
+  node_version
 end
 
 run "rm #{ember_app}/.ember-cli"
@@ -164,6 +162,40 @@ FILE
 inject_into_file "#{ember_app}/app/app.js", after: 'loadInitializers(App, config.modulePrefix);' do
   "\nloadInitializers(App, 'rails-csrf');"
 end
+
+# Setup annotate gem
+run 'rails generate annotate:install'
+
+# Remove test folder
+run 'rm -rf test/'
+
+# Setup rspec
+run 'rails generate rspec:install'
+
+# Setup factory_girl
+file 'spec/support/factory_girl.rb', <<-FILE
+RSpec.configure do |config|
+  config.include FactoryGirl::Syntax::Methods
+end
+FILE
+# Allow support files to be
+gsub_file 'spec/rails_helper.rb', /# Dir\[Rails\.root\.join/, 'Dir[Rails.root.join'
+
+# Download the most recent gitignore boilerplate
+run "curl -o .gitignore 'https://raw.githubusercontent.com/inigo-llc/ember-cli-rails/master/gitignore_boilerplate'"
+
+# Download the most recent rubocop boilerplate
+run "curl -o .rubocop.yml 'https://raw.githubusercontent.com/inigo-llc/ember-cli-rails/master/rubocop_boilerplate'"
+
+# Remove normal readme
+run 'rm README.rdoc'
+
+# Download the most recent README boilerplate
+run "curl -o README.md 'https://raw.githubusercontent.com/inigo-llc/ember-cli-rails/master/readme_boilerplate'"
+# Fill in README template
+gsub_file 'README.md', /<app-name>/, "#{@app_name}"
+gsub_file 'README.md', /<ruby-version>/, ruby_version
+gsub_file 'README.md', /<node-version>/, node_version
 
 # Initialize git repo
 run 'git init'
