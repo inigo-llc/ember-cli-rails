@@ -43,17 +43,24 @@ run "bundle install"
 # cleanup
 run "rm Gemfile.bak"
 
-create_file "app/controllers/ember_application_controller.rb" do
-  <<-FILE
+file "app/controllers/ember_application_controller.rb", <<-FILE
 class EmberApplicationController < ApplicationController
   def index
     render file: 'public/index.html'
   end
 end
-  FILE
-end
+FILE
 
-route "get '(*path)', to: 'ember_application#index'"
+file "app/controllers/api/csrf_controller.rb", <<-FILE
+class Api::CsrfController < ApplicationController
+  def index
+    render json: { request_forgery_protection_token => form_authenticity_token }.to_json
+  end
+end
+FILE
+
+route "get :csrf, to: 'csrf#index'"
+route "get '(*path)', to: 'ember_application#index' # Clobbers all routes, Keep this as the last route in the routes file"
 
 create_file ".ruby-version" do
   "2.1.4"
@@ -69,8 +76,7 @@ create_file ".nvmrc" do
 end
 
 # Create the file that sets the default ember serve options (like the proxy)
-create_file "#{ember-app}/.ember-cli" do
-  <<-FILE
+file "#{ember-app}/.ember-cli", <<-FILE
 {
   /**
     Ember CLI sends analytics information by default. The data is completely
@@ -81,8 +87,7 @@ create_file "#{ember-app}/.ember-cli" do
   "disableAnalytics": false,
   "proxy": "http://localhost:3000"
 }
-  FILE
-end
+FILE
 
 # Setup smartcd to prepend  ./node_modules/.bin to our path when we enter the ember application folder
 # create_file "#{ember-app}/.bash_enter" do
