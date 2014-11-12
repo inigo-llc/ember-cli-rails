@@ -9,6 +9,7 @@ building and testing your rails app.
 ## Dependencies
 
 You will need the usual [development setup](https://github.com/inigo-llc/guides#setting-up-your-development-enviroment): 
+- git
 - ruby
   - bundler
   - rails
@@ -38,8 +39,8 @@ To work on the project, cd into the project root and:
 $ bin/rails s
 ```
 
-In another tab cd into your ember app (it'll be inside the rails root and 
-labled with your app-name-ember). From within the ember-app directory run the
+In another tab cd into your ember app (it'll be inside the project root and 
+labled with your app-ember). From within the ember-app directory run the
 development ember server
 
 ```bash
@@ -52,7 +53,7 @@ This will proxy api calls to your rails backend. For more information see the
 
 ## Deployment
 
-From time to time, or whenever time to deploy, cd to your rails root and run:
+From time to time, or whenever time to deploy, cd to your project root and run:
 
 ```bash
 $ rake ember:build
