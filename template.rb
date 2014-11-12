@@ -53,9 +53,14 @@ class EmberApplicationController < ApplicationController
 end
 FILE
 
+gsub_file /  #.*\n/g, ''
+
 route "get '(*path)', to: 'ember_application#index'"
 route "# Clobbers all routes, Keep this as the last route in the routes file"
-route ""
+inject_info_file "app/config/routes.rb",
+                 before: "# Clobbers all routes, Keep this as the last route in the routes file" do
+  "\n\n"
+end
 
 create_file ".ruby-version" do
   "2.1.4"
@@ -69,6 +74,8 @@ run "ember new #{ember_app}"
 create_file ".nvmrc" do
   "0.10.32"
 end
+
+run "rm #{ember_app}/.ember-cli"
 
 # Create the file that sets the default ember serve options (like the proxy)
 file "#{ember_app}/.ember-cli", <<-FILE
@@ -144,13 +151,9 @@ export default Ember.Route.extend({
 });
   FILE
   
-  action_messages << <<-MESSAGE
-Please add:
-
-loadInitializers(App, 'rails-csrf');
-
-to the #{ember_app}/app/app.js file.
-  MESSAGE
+  inject_into_file "#{ember_app}/app/app.js", after: "loadInitializers(App, config.modulePrefix);" do
+    "loadInitializers(App, 'rails-csrf');"
+  end
 end
 
 puts <<-MESSAGE
