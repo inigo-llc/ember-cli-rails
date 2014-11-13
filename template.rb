@@ -210,6 +210,8 @@ gsub_file 'README.md', /<node-version>/, node_version
 # Initialize git repo
 run 'git init'
 
+run 'rake db:setup'
+
 puts <<-MESSAGE
 
 ***********************************************************
