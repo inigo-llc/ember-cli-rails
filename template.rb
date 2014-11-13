@@ -26,6 +26,8 @@ gem_group :development, :test do
   gem 'annotate'
   gem 'brakeman'
   gem 'factory_girl_rails'
+  gem 'pry-rails'
+  gem 'pry-byebug'
   gem 'rspec-rails'
   gem 'rubocop'
 end
@@ -35,9 +37,12 @@ run "sed -i.bak '/turbolinks/d' Gemfile"
 run "sed -i.bak '/coffee/d' Gemfile"
 run "sed -i.bak '/jbuilder/d' Gemfile"
 run "sed -i.bak '/jquery-rails/d' Gemfile"
+run "sed -i.bak '/Use jquery/d' Gemfile"
 run "sed -i.bak '/sqlite3/d' Gemfile"
 run "sed -i.bak '/sass-rails/d' Gemfile"
+run "sed -i.bak '/Use SCSS/d' Gemfile"
 run "sed -i.bak '/uglifier/d' Gemfile"
+run "sed -i.bak '/Use Uglifier/d' Gemfile"
 
 # Keep before bundle install
 create_file '.ruby-version' do
@@ -49,6 +54,9 @@ run 'bundle install'
 
 # cleanup
 run 'rm Gemfile.bak'
+
+# Initialize the database
+run 'rake db:migrate'
 
 file 'app/controllers/ember_application_controller.rb', <<-FILE
 class EmberApplicationController < ApplicationController
@@ -185,6 +193,9 @@ run "curl -o .gitignore 'https://raw.githubusercontent.com/inigo-llc/ember-cli-r
 
 # Download the most recent rubocop boilerplate
 run "curl -o .rubocop.yml 'https://raw.githubusercontent.com/inigo-llc/ember-cli-rails/master/rubocop_boilerplate'"
+
+# Download the most recent reports boilerplate
+run "curl -o lib/tasks/reports.rake 'https://raw.githubusercontent.com/inigo-llc/ember-cli-rails/master/reports_rake_boilerplate'"
 
 # Remove normal readme
 run 'rm README.rdoc'

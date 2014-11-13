@@ -1,0 +1,36 @@
+task default: 'reports:all'
+
+namespace :reports do
+  desc 'Run all preflight reports'
+  task all: [:fixme_notes] do
+    system 'bundle exec brakeman'
+    system 'bundle exec rubocop -RD'
+  end
+
+  desc 'Run brakeman & rubocop with html formats and save them to /reports'
+  task :html do
+    system 'bundle exec rubocop -RDf progress -f html -o reports/rubocop.html'
+    system 'bundle exec brakeman -o reports/brakeman.html'
+  end
+
+  desc 'Create a report on all notes'
+  task :notes do
+    puts "\nCollecting all of the standard code notes..."
+    system 'bin/rake notes'
+    puts "\nCollecting all HACK code notes..."
+    system 'bin/rake notes:custom ANNOTATION=HACK'
+    puts "\nCollecting all spec code notes..."
+    system "grep -rnE 'OPTIMIZE:|OPTIMIZE|FIXME:|FIXME|TODO:|TODO|HACK:|HACK'"\
+           ' spec'
+  end
+
+  desc 'Print only FIXME notes'
+  task :fixme_notes do
+    puts "\nFIXME Notes (These should all be fixed before merging to master):"
+    system 'bin/rake notes:fixme'
+    system "grep -rnE 'FIXME:|FIXME'"\
+           ' spec'
+    system "grep -rnE 'FIXME:|FIXME'"\
+           ' app/views'
+  end
+end
