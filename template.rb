@@ -146,9 +146,9 @@ end
 
 file 'app/controllers/api/csrf_controller.rb', <<-FILE
 class Api::CsrfController < ApplicationController
-def index
-  render json: { request_forgery_protection_token => form_authenticity_token }.to_json
-end
+  def index
+    render json: { request_forgery_protection_token => form_authenticity_token }.to_json
+  end
 end
 FILE
 
@@ -160,9 +160,9 @@ file "#{ember_app}/app/routes/application.js", <<-FILE
 import Ember from 'ember';
 
 export default Ember.Route.extend({
-beforeModel: function() {
-  return this.csrf.fetchToken();
-}
+  beforeModel: function() {
+    return this.csrf.fetchToken();
+  }
 });
 FILE
 
