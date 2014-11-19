@@ -138,7 +138,11 @@ end
   TASK
 end
 
-route "get :csrf, to: 'csrf#index'"
+route <<-FILE
+namespace :api do
+    get :csrf, to: 'csrf#index'
+  end
+FILE
 inject_into_file 'config/routes.rb',
                  before: '  # Clobbers all routes, Keep this as the last route in the routes file' do
   "\n\n"
