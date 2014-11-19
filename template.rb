@@ -209,6 +209,8 @@ gsub_file 'README.md', /<node-version>/, node_version
 
 # Initialize git repo
 run 'git init'
+run 'git add .'
+run "git commit -m 'Initial commit.'"
 
 run 'rake db:setup'
 
