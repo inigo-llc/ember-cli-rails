@@ -14,11 +14,17 @@ action_messages = []
 
 # Install required gems
 gem 'api_me'
+gem 'token_authenticate_me'
 gem 'squeel'
 
 # Install production gems
 gem_group :production do
   gem 'rails_12factor'
+end
+
+# Add nyan-cat-formatter gem
+gem_group :test do
+  gem 'nyan-cat-formatter'
 end
 
 # Install development and test gems
@@ -63,6 +69,10 @@ run 'rm Gemfile.bak'
 
 # Initialize the database
 run 'rake db:migrate'
+
+inject_into_file 'app/controllers/application_controller.rb', after: 'class ApplicationController < ActionController::Base' do
+  "\n  force_ssl if Rails.env.production?\n"
+end
 
 file 'app/controllers/ember_application_controller.rb', <<-FILE
 class EmberApplicationController < ApplicationController
@@ -162,6 +172,18 @@ class Api::CsrfController < ApplicationController
 end
 FILE
 
+# Install token_authenticate_me
+run 'rails g token_authenticate_me:install user'
+
+# Configure token_authenticate_me
+inject_into_file 'app/controllers/application_controller.rb', before: 'class' do
+  "require 'token_authenticate_me/controllers/token_authenticateable'\n"
+end
+inject_into_file 'app/controllers/application_controller.rb', after: 'with: :exception' do
+  "\n  include TokenAuthenticateMe::Controllers::TokenAuthenticateable\n"
+end
+run 'rake db:migrate'
+
 inside "#{ember_app}" do
   run 'npm install rails-csrf --save-dev'
   run 'npm install torii --save-dev'
@@ -191,6 +213,9 @@ run 'rm -rf test/'
 
 # Setup rspec
 run 'rails generate rspec:install'
+
+# Add nyan-cat-formatter to rspec
+append_to_file '.rspec', '--format NyanCatWideFormatter\n'
 
 # Setup factory_girl
 file 'spec/support/factory_girl.rb', <<-FILE
