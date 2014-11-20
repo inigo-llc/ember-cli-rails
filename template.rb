@@ -8,7 +8,7 @@
 # This template assumes you have followed the setup guide at:
 # https://github.com/inigo-llc/guides/#setting-up-your-development-enviroment
 #
-ruby_version = '2.1.4'
+ruby_version = '2.1.5'
 node_version = '0.10.32'
 action_messages = []
 
