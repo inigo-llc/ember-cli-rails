@@ -52,6 +52,9 @@ end
 # Install gems using bundler
 run 'bundle install'
 
+# Install api_me
+run 'rails g api_me:install'
+
 # cleanup
 run 'rm Gemfile.bak'
 
