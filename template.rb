@@ -215,7 +215,7 @@ run 'rm -rf test/'
 run 'rails generate rspec:install'
 
 # Add nyan-cat-formatter to rspec
-append_to_file '.rspec', '--format NyanCatWideFormatter\n'
+append_to_file '.rspec', '--format NyanCatWideFormatter'
 
 # Setup factory_girl
 file 'spec/support/factory_girl.rb', <<-FILE
