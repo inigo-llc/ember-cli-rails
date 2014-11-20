@@ -68,6 +68,7 @@ run 'rails g api_me:install'
 run 'rm Gemfile.bak'
 
 # Initialize the database
+run 'rake db:create'
 run 'rake db:migrate'
 
 inject_into_file 'app/controllers/application_controller.rb', after: 'class ApplicationController < ActionController::Base' do
