@@ -158,6 +158,9 @@ FILE
 
 inside "#{ember_app}" do
   run 'npm install rails-csrf --save-dev'
+  run 'npm install torii --save-dev'
+  run 'npm install ember-authenticate-me --save-dev'
+  run 'ember generate user user'
 end
 
 file "#{ember_app}/app/routes/application.js", <<-FILE
