@@ -32,6 +32,9 @@ gem_group :development, :test do
   gem 'rubocop'
 end
 
+# Update to latest patch version of rails
+gsub_file 'gemfile', /gem 'rails', '/, "gem 'rails', '~>"
+
 # kill un-needed gems
 run "sed -i.bak '/turbolinks/d' Gemfile"
 run "sed -i.bak '/coffee/d' Gemfile"
