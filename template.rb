@@ -61,9 +61,6 @@ end
 # Install gems using bundler
 run 'bundle install'
 
-# Install api_me
-run 'rails g api_me:install'
-
 # cleanup
 run 'rm Gemfile.bak'
 
@@ -214,6 +211,9 @@ run 'rm -rf test/'
 
 # Setup rspec
 run 'rails generate rspec:install'
+
+# Install api_me
+run 'rails g api_me:install'
 
 # Add nyan-cat-formatter to rspec
 append_to_file '.rspec', '--format NyanCatWideFormatter'
