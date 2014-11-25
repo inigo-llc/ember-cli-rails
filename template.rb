@@ -16,6 +16,7 @@ action_messages = []
 gem 'api_me'
 gem 'token_authenticate_me'
 gem 'squeel'
+gem 'active_model_serializers', '~> 0.8'
 
 # Install production gems
 gem_group :production do
