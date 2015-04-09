@@ -48,13 +48,21 @@ gsub_file 'gemfile', /gem 'rails', '/, "gem 'rails', '~>"
 
 # kill un-needed gems
 run "sed -i.bak '/turbolinks/d' Gemfile"
+
 run "sed -i.bak '/coffee/d' Gemfile"
+
 run "sed -i.bak '/jbuilder/d' Gemfile"
 run "sed -i.bak '/jquery-rails/d' Gemfile"
 run "sed -i.bak '/Use jquery/d' Gemfile"
+
+run "sed -i.bak '/spring/d' Gemfile"
+run "sed -i.bak '/Spring speeds/d' Gemfile"
+
 run "sed -i.bak '/sqlite3/d' Gemfile"
+
 run "sed -i.bak '/sass-rails/d' Gemfile"
 run "sed -i.bak '/Use SCSS/d' Gemfile"
+
 run "sed -i.bak '/uglifier/d' Gemfile"
 run "sed -i.bak '/Use Uglifier/d' Gemfile"
 # cleanup
