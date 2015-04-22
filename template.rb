@@ -6,10 +6,10 @@
 #    http://edgeguides.rubyonrails.org/rails_application_templates.html
 #
 # This template assumes you have followed the setup guide at:
-# https://github.com/inigo-llc/guides/#setting-up-your-development-enviroment
+# https://github.com/wildland/guides/#setting-up-your-development-enviroment
 #
 ruby_version = '2.1.5'
-node_version = '0.10.32'
+node_version = 'iojs-v1.5.0'
 action_messages = []
 
 # Initialize git repo
@@ -18,22 +18,22 @@ git add: '.'
 git commit: "-m 'Initial commit.'"
 
 # Download the most recent gitignore boilerplate
-run "curl -o .gitignore 'https://raw.githubusercontent.com/inigo-llc/ember-cli-rails/master/gitignore_boilerplate'"
+run "curl -o .gitignore 'https://raw.githubusercontent.com/wildland/ember-cli-rails/master/gitignore_boilerplate'"
 
 # Remove normal readme
 run 'rm README.rdoc'
 
 # Download the most recent README boilerplate
-run "curl -o README.md 'https://raw.githubusercontent.com/inigo-llc/ember-cli-rails/master/readme_boilerplate'"
+run "curl -o README.md 'https://raw.githubusercontent.com/wildland/ember-cli-rails/master/readme_boilerplate'"
 # Fill in README template
 gsub_file 'README.md', /<app-name>/, "#{@app_name}"
 gsub_file 'README.md', /<ruby-version>/, ruby_version
 gsub_file 'README.md', /<node-version>/, node_version
 
 # Download the most recent reports boilerplate
-run "curl -o lib/tasks/reports.rake 'https://raw.githubusercontent.com/inigo-llc/ember-cli-rails/master/reports_rake_boilerplate'"
+run "curl -o lib/tasks/reports.rake 'https://raw.githubusercontent.com/wildland/ember-cli-rails/master/reports_rake_boilerplate'"
 # Download the most recent rubocop boilerplate
-run "curl -o .rubocop.yml 'https://raw.githubusercontent.com/inigo-llc/ember-cli-rails/master/rubocop_boilerplate'"
+run "curl -o .rubocop.yml 'https://raw.githubusercontent.com/wildland/ember-cli-rails/master/rubocop_boilerplate'"
 
 # Create ruby and node version files
 create_file '.ruby-version' do
@@ -193,8 +193,7 @@ end
 FILE
 
 inside "#{ember_app}" do
-  run 'npm install rails-csrf --save-dev'
-  run 'npm install torii --save-dev'
+  run 'npm install  --save-dev rails-csrf'
 end
 
 file "#{ember_app}/app/routes/application.js", <<-FILE
@@ -232,12 +231,12 @@ end
 # Recipes
 ###
 
-# api_me
+# api_me installation
 gem 'api_me'
 run 'bundle install'
 run 'rails g api_me:install'
 
-# token_authenticate_me
+# Token Authentication Installation and Setup (token_authenticate_me and ember-authenticate-me)
 gem 'token_authenticate_me'
 run 'bundle install'
 run 'rails g token_authenticate_me:install user'
@@ -256,23 +255,14 @@ run 'rails g api_me:filter user'
 run 'user username email created_at updated_at'
 # Ember part
 inside "#{ember_app}" do
-  run 'npm install ember-authenticate-me --save-dev'
-  run 'ember generate user user'
-end
-prepend_to_file "#{ember_app}/app/router.js" do
-  "import AddRoutes from 'ember-authenticate-me/add-routes';\n"
-end
-inject_into_file 'app-ember/app/router.js', after: "Router.map(function() {" do
-  "\n  AddRoutes(this);"
+  run 'ember install  ember-authenticate-me'
+  run 'ember generate user'
 end
 
-
-# Nyan formatter
-gem_group :test do
-  gem 'nyan-cat-formatter'
+# Ember Authorization (ember-sanctify)
+inside "#{ember_app}" do
+  run 'ember install ember-sanctify'
 end
-run 'bundle install'
-append_to_file '.rspec', '--format NyanCatWideFormatter'
 
 puts <<-MESSAGE
 
