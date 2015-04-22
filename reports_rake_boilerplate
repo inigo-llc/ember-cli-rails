@@ -2,7 +2,7 @@ task default: 'reports:all'
 
 namespace :reports do
   desc 'Run all preflight reports'
-  task all: [:fixme_notes] do
+  task all: [:fixme_notes, :ruby_debugger, :js_debugger] do
     system 'bundle exec brakeman'
     system 'bundle exec rubocop -RD'
   end
@@ -32,5 +32,25 @@ namespace :reports do
            ' spec'
     system "grep -rnE 'FIXME:|FIXME'"\
            ' app/views'
+  end
+
+  desc 'Find ruby debugger statements.'
+  task :ruby_debugger do
+    puts "\nRuby debuggers (These should all be removed before merging to master):"
+    %w(binding.pry puts).each do |debugger|
+      %w(app/).each do |dir|
+        system "grep -rnE '#{debugger}' #{dir}"
+      end
+    end
+  end
+
+  desc 'Find js debugger statements.'
+  task :js_debugger do
+    puts "\nJS debuggers (These should all be removed before merging to master):"
+    %w(debugger).each do |debugger|
+      %w(app-ember/app).each do |dir|
+        system "grep -rnE '#{debugger}' #{dir}"
+      end
+    end
   end
 end

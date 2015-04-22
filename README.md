@@ -8,7 +8,7 @@ building and testing your rails app.
 
 ## Dependencies
 
-You will need the usual [development setup](https://github.com/inigo-llc/guides#setting-up-your-development-enviroment): 
+You will need the usual [development setup](https://github.com/wildland/guides#setting-up-your-development-enviroment): 
 - git
 - ruby
   - bundler
@@ -21,7 +21,7 @@ You will need the usual [development setup](https://github.com/inigo-llc/guides#
 ## Usage
 
 ```bash
-$ rails new <app-name> -m https://raw.githubusercontent.com/inigo-llc/ember-cli-rails/master/template.rb --database=postgresql
+$ rails new <app-name> -m https://raw.githubusercontent.com/wildland/ember-cli-rails/master/template.rb --database=postgresql
 ```
 
 You now have a rails project with an ember-cli project within it.
