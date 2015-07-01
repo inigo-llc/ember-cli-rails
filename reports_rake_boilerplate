@@ -53,4 +53,33 @@ namespace :reports do
       end
     end
   end
+
+  desc 'Run rubocop against all created/changed ruby files'
+  task :rubocop_recent, [:autocorrect] do |t, args|
+    require 'rubocop'
+
+    module RuboCop
+      class TargetFinder
+        def find(args)
+          changed_git_files = `git diff --name-only --cached`.split(/\n/)
+
+          rubocop_target_finder = RuboCop::TargetFinder.new(RuboCop::ConfigStore.new)
+          rubocop_config_store = RuboCop::ConfigStore.new
+          rubocop_base_config = rubocop_config_store.for(File.expand_path('../../', __dir__))
+
+          files_to_check = changed_git_files.select do |file|
+            rubocop_target_finder.to_inspect?(file, [], rubocop_base_config)
+          end
+
+          return files_to_check
+        end
+      end
+    end
+
+    if args[:autocorrect]
+      exit RuboCop::CLI.new.run(['-aD'])
+    else
+      exit RuboCop::CLI.new.run(['-D'])
+    end
+  end
 end

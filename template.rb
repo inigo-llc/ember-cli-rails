@@ -32,6 +32,8 @@ gsub_file 'README.md', /<node-version>/, node_version
 
 # Download the most recent reports boilerplate
 run "curl -o lib/tasks/reports.rake 'https://raw.githubusercontent.com/wildland/ember-cli-rails/master/reports_rake_boilerplate'"
+# Download the most recent wildland boilerplate
+run "curl -o lib/tasks/setup.rake 'https://raw.githubusercontent.com/wildland/ember-cli-rails/master/wildland_rake_boilerplate'"
 # Download the most recent rubocop boilerplate
 run "curl -o .rubocop.yml 'https://raw.githubusercontent.com/wildland/ember-cli-rails/master/rubocop_boilerplate'"
 

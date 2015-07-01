@@ -10,38 +10,12 @@ Repository for the <app-name> project
 *none*
 
 ### Getting started
-[Quick Start](https://github.com/inigo-llc/guides) for getting development machine setup.
+[Quick Start](https://github.com/wildland/guides#setting-up-your-development-enviroment) for getting development machine setup.
 
-1. Install all the [system requirements](/#system-requirements).
-1. [Clone](https://help.github.com/articles/fetching-a-remote/#clone) this repository.
-1. Run `bundle install`
-1. Run `npm install` inside of the `./app-ember` directory.
-1. Run `bower install` inside of the `./app-ember` directory.
-1. Run `bundle install` inside of the `./app-ember` directory.
-1. Run `rake db:setup`
-1. Run `rake demo:seed`
-1. Run `rails start`
-1. Run `npm start` inside `./app-ember` directory to start the ember server.
+1. Run `rake wildland:setup`
 
 ### Getting work done
-If you are not starting a new feature, you can skip the following steps.
-
-1. Get to the `master` branch by using `git checkout master`.
-2. Pull the latest master from the repository using `git pull --rebase`.
-3. Create a new branch for your feature using `git create-branch <feature-name>`.
-
-You are now ready to start working on your code.
-
-***
-
-When you are feel like you are finished go through the following steps.
-
-1. Run `bin/rake` and make sure that your rails code is ready.
-2. Run `npm test` inside of the `./app-ember` directory and make sure that your ember code is ready.
-3. Run `git irebase-origin` to prep your code for review.
-4. Create a [pull request](https://help.github.com/articles/using-pull-requests/) or `git pull-request` if you have [hub](https://github.com/github/hub) installed.
-5. Let someone else know that your request is ready for review.
-6. Wait for them to :+1: your pull request and accept it, or provide feedback.
+[Wildland guide](https://github.com/wildland/) for getting work done.
 
 ## Production Requirements
 ### Enviroment varables
