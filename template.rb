@@ -9,7 +9,7 @@
 # https://github.com/wildland/guides/#setting-up-your-development-enviroment
 #
 ruby_version = '2.2.2'
-node_version = 'v0.12.7'
+node_version = 'v4.0.0'
 action_messages = []
 
 # Initialize git repo
