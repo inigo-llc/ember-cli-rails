@@ -8,8 +8,8 @@
 # This template assumes you have followed the setup guide at:
 # https://github.com/wildland/guides/#setting-up-your-development-enviroment
 #
-ruby_version = '2.1.5'
-node_version = 'iojs-v1.5.0'
+ruby_version = '2.2.2'
+node_version = 'v4.0.0'
 action_messages = []
 
 # Initialize git repo
@@ -30,10 +30,6 @@ gsub_file 'README.md', /<app-name>/, "#{@app_name}"
 gsub_file 'README.md', /<ruby-version>/, ruby_version
 gsub_file 'README.md', /<node-version>/, node_version
 
-# Download the most recent reports boilerplate
-run "curl -o lib/tasks/reports.rake 'https://raw.githubusercontent.com/wildland/ember-cli-rails/master/reports_rake_boilerplate'"
-# Download the most recent wildland boilerplate
-run "curl -o lib/tasks/setup.rake 'https://raw.githubusercontent.com/wildland/ember-cli-rails/master/wildland_rake_boilerplate'"
 # Download the most recent rubocop boilerplate
 run "curl -o .rubocop.yml 'https://raw.githubusercontent.com/wildland/ember-cli-rails/master/rubocop_boilerplate'"
 
@@ -49,18 +45,8 @@ end
 gsub_file 'gemfile', /gem 'rails', '/, "gem 'rails', '~>"
 
 # kill un-needed gems
-run "sed -i.bak '/turbolinks/d' Gemfile"
-
-run "sed -i.bak '/coffee/d' Gemfile"
 
 run "sed -i.bak '/jbuilder/d' Gemfile"
-run "sed -i.bak '/jquery-rails/d' Gemfile"
-run "sed -i.bak '/Use jquery/d' Gemfile"
-
-run "sed -i.bak '/spring/d' Gemfile"
-run "sed -i.bak '/Spring speeds/d' Gemfile"
-
-run "sed -i.bak '/sqlite3/d' Gemfile"
 
 run "sed -i.bak '/sass-rails/d' Gemfile"
 run "sed -i.bak '/Use SCSS/d' Gemfile"
@@ -76,11 +62,13 @@ gem_group :production do
 end
 # Install Squeel
 gem 'squeel'
+gem 'factory_girl_rails'
+
 # Install development and test gems
 gem_group :development, :test do
+  gem 'wildland_dev_tools', '>=0.1.0', git: 'https://github.com/wildland/wildland_dev_tools.git'
   gem 'annotate'
   gem 'brakeman'
-  gem 'factory_girl_rails'
   gem 'pry-rails'
   gem 'pry-byebug'
   gem 'rspec-rails'
@@ -106,6 +94,17 @@ RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
 end
 FILE
+
+# Add seed task
+create_file 'lib/tasks/demo.rake' do
+  %q(require 'factory_girl'
+
+  namespace :demo do
+    task seed: :environment do
+      # Add any seed information here
+    end
+  end)
+end
 
 # Initialize the database
 run 'rake db:create'
@@ -140,6 +139,10 @@ run "ember new #{ember_app}"
 # Remove the sub-git project created
 run "rm -rf #{ember_app}/.git/"
 run "rm #{ember_app}/.ember-cli"
+
+create_file "#{ember_app}/.nvmrc" do
+  node_version
+end
 
 # Create the file that sets the default ember serve options (like the proxy)
 file "#{ember_app}/.ember-cli", <<-FILE
@@ -212,23 +215,6 @@ inject_into_file "#{ember_app}/app/app.js", after: 'loadInitializers(App, config
   "\nloadInitializers(App, 'rails-csrf');"
 end
 
-# Ember build rake task
-rakefile('build.rake') do
-  <<-TASK
-namespace :ember do
-  task :build do
-    Dir.chdir('#{ember_app}') do
-      sh './node_modules/.bin/ember build --environment=production'
-    end
-
-    sh 'mv public/ public.bak/'
-    sh 'mkdir public/'
-    sh 'cp -r #{ember_app}/dist/ public/'
-  end
-end
-  TASK
-end
-
 ###
 # Recipes
 ###
@@ -239,7 +225,7 @@ run 'bundle install'
 run 'rails g api_me:install'
 
 # Token Authentication Installation and Setup (token_authenticate_me and ember-authenticate-me)
-gem 'token_authenticate_me'
+gem 'token_authenticate_me', '>=0.4.2'
 run 'bundle install'
 run 'rails g token_authenticate_me:install user'
 run 'rake db:migrate'
@@ -266,16 +252,15 @@ inside "#{ember_app}" do
   run 'ember install ember-sanctify'
 end
 
+git add: '.'
+git commit: "-m 'Project #{@app_name} initialized'"
+
 puts <<-MESSAGE
 
 ***********************************************************
 
 Your ember-cli app is located at: '#{@app_path}/#{ember_app}'
 see: https://github.com/stefanpenner/ember-cli
-
-To build the ember project for deployment run
-
-`rake ember:build`
 
 ***********************************************************
 
