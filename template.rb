@@ -66,7 +66,7 @@ gem 'factory_girl_rails'
 
 # Install development and test gems
 gem_group :development, :test do
-  gem 'wildland_dev_tools', '>=0.1.0', git: 'https://github.com/wildland/wildland_dev_tools.git'
+  gem 'wildland_dev_tools', '>=0.1.0', git: 'git+ssh://git@github.com/wildland/wildland_dev_tools.git'
   gem 'annotate'
   gem 'brakeman'
   gem 'pry-rails'
