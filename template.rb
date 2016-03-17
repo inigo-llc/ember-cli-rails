@@ -8,9 +8,10 @@
 # This template assumes you have followed the setup guide at:
 # https://github.com/wildland/guides/#setting-up-your-development-enviroment
 #
-ruby_version = '2.2.2'
-node_version = 'v4.0.0'
+ruby_version = '2.2.3'
+node_version = 'v5.4.0'
 action_messages = []
+branch = 'master'
 
 # Initialize git repo
 git :init
@@ -18,13 +19,13 @@ git add: '.'
 git commit: "-m 'Initial commit.'"
 
 # Download the most recent gitignore boilerplate
-run "curl -o .gitignore 'https://raw.githubusercontent.com/wildland/ember-cli-rails/master/gitignore_boilerplate'"
+run "curl -o .gitignore 'https://raw.githubusercontent.com/wildland/ember-cli-rails/#{branch}/gitignore_boilerplate'"
 
 # Remove normal readme
 run 'rm README.rdoc'
 
 # Download the most recent README boilerplate
-run "curl -o README.md 'https://raw.githubusercontent.com/wildland/ember-cli-rails/master/readme_boilerplate'"
+run "curl -o README.md 'https://raw.githubusercontent.com/wildland/ember-cli-rails/#{branch}/readme_boilerplate'"
 # Fill in README template
 gsub_file 'README.md', /<app-name>/, "#{@app_name}"
 gsub_file 'README.md', /<ruby-version>/, ruby_version
@@ -39,6 +40,10 @@ create_file '.ruby-version' do
 end
 create_file '.nvmrc' do
   node_version
+end
+
+create_file 'Procfile' do
+
 end
 
 # Update to latest patch version of rails
@@ -56,6 +61,10 @@ run "sed -i.bak '/Use Uglifier/d' Gemfile"
 # cleanup
 run 'rm Gemfile.bak'
 
+inject_into_file 'Gemfile', after: "source 'https://rubygems.org'" do
+  "\ngem 'dotenv-rails', groups: [:development, :test], require: 'dotenv/rails-now'"
+end
+
 # Install production gems
 gem_group :production do
   gem 'rails_12factor'
@@ -63,6 +72,9 @@ end
 # Install Squeel
 gem 'squeel'
 gem 'factory_girl_rails'
+gem 'mailcatcher'
+gem 'puma'
+gem "ember-cli-rails", '~> 0.7.1'
 
 # Install development and test gems
 gem_group :development, :test do
@@ -87,6 +99,149 @@ run 'rails generate rspec:install'
 gsub_file 'spec/rails_helper.rb', /# Dir\[Rails\.root\.join/, 'Dir[Rails.root.join'
 # Remove test folder
 run 'rm -rf test/'
+
+# Add heroku buildpacks for heroku deployment
+file '.buildpacks', <<-FILE
+https://github.com/heroku/heroku-buildpack-ruby.git
+https://github.com/heroku/heroku-buildpack-nodejs.git
+FILE
+
+# Setup default app.json for heroku deployments
+file 'app.json', <<-FILE
+{
+  "name": "#{@app_name}",
+  "scripts": {
+    "postdeploy": "rake db:setup && rake demo:seed"
+  },
+  "env": {
+    "LANG": {
+      "required": true
+    },
+    "RACK_ENV": {
+      "required": true
+    },
+    "RAILS_ENV": {
+      "required": true
+    },
+    "RAILS_SERVE_STATIC_FILES": {
+      "required": true
+    },
+    "SECRET_KEY_BASE": {
+      "required": true
+    },
+    "NPM_CONFIG_PRODUCTION": {
+      "required": true
+    },
+    "WILDLAND_STATUS_BAR": "development"
+  },
+  "addons": [
+    "heroku-postgresql",
+    "sendgrid:starter"
+  ],
+  "buildpacks": [
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-nodejs"
+    },
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-ruby"
+    }
+  ]
+}
+FILE
+
+file '.env', <<-FILE
+SKIP_EMBER=true
+FILE
+
+# Setup Procfile to handle auto starting all entire app all at once
+file 'Procfile', <<-FILE
+web: bundle exec puma -C config/puma.rb
+log: bin/log
+mailcatcher: bin/mailcatcher
+ember: bin/ember
+FILE
+
+
+# Setup puma
+file 'config/puma.rb', <<-FILE
+workers Integer(ENV['WEB_CONCURRENCY'] || 2)
+threads_count = Integer(ENV['MAX_THREADS'] || 5)
+threads threads_count, threads_count
+
+preload_app!
+
+rackup      DefaultRackup
+port        ENV['PORT']     || 5000
+environment ENV['RACK_ENV'] || 'development'
+
+on_worker_boot do
+  # Worker specific setup for Rails 4.1+
+  # See: https://devcenter.heroku.com/articles/deploying-rails-applications-with-the-puma-web-server#on-worker-boot
+  ActiveRecord::Base.establish_connection
+end
+FILE
+
+# Setup ember launcher script
+file 'bin/ember', <<-FILE
+#!/bin/sh
+if [ ${RACK_ENV:=development} == "development" ]; then
+  cd app-ember
+  ember server --proxy http://localhost:5000 --port 4200
+fi
+FILE
+run 'chmod u+x bin/ember'
+
+# Setup mailcatcher launcher script
+file 'bin/mailcatcher', <<-FILE
+#!/bin/sh
+if [ ${RACK_ENV:=development} == "development" ]; then
+  bundle exec mailcatcher -f
+fi
+FILE
+run 'chmod u+x bin/mailcatcher'
+
+file 'config/initializers/ember.rb', <<-FILE
+EmberCli.configure do |c|
+  c.app :frontend, path: './app-ember'
+end
+FILE
+
+file 'app/views/ember_cli/ember/index.html.erb', <<-FILE
+<%= render_ember_app ember_app do |head, body| %>
+  <% head.append do %>
+    <%= csrf_meta_tags %>
+  <% end %>
+  <% body.append do %>
+    <% if Rails.application.secrets.wildland_server_status == 'development' %>
+      <div id="pipeline-flag">
+        <div class="development-flag">
+          <p>Development</p>
+        </div>
+      </div>
+    <% end %>
+    <% if Rails.application.secrets.wildland_server_status == 'staging' %>
+      <div id="pipeline-flag">
+        <div class="staging-flag">
+          <p>Staging</p>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
+FILE
+
+inject_into_file 'config/secrets.yml', after: 'production:' do
+  "\n  wildland_server_status: <%= ENV['WILDLAND_STATUS_BAR'] %>"
+end
+
+environment 'config.action_mailer.raise_delivery_errors = true', env: 'development'
+environment 'config.action_mailer.delivery_method = :smtp', env: 'development'
+environment 'config.action_mailer.smtp_settings = { address: "localhost", port: 1025 }', env: 'development'
+environment 'config.action_mailer.default_options = { from: "no-reply@example.org" }', env: 'development'
+
+inject_into_file 'app/controllers/application_controller.rb', after: 'class ApplicationController < ActionController::Base' do
+  "\n  force_ssl if Rails.env.production?\n"
+end
 
 # Setup factory_girl
 file 'spec/support/factory_girl.rb', <<-FILE
@@ -128,7 +283,7 @@ gsub_file 'config/routes.rb', /^(  #.*\n)|(\n)/, ''
 inject_into_file 'config/routes.rb', after: 'do' do
   "\n"
 end
-route "get '(*path)', to: 'ember_application#index'"
+route "mount_ember_app :frontend, to: '/', controller: 'ember_application'"
 route '# Clobbers all routes, Keep this as the last route in the routes file'
 
 ember_app = 'app-ember'
@@ -158,43 +313,36 @@ file "#{ember_app}/.ember-cli", <<-FILE
 }
 FILE
 
-route <<-FILE
-namespace :api do
-    get :csrf, to: 'csrf#index'
-  end
-FILE
 inject_into_file 'config/routes.rb',
                  before: '  # Clobbers all routes, Keep this as the last route in the routes file' do
   "\n\n"
 end
 
-file 'app/controllers/api/csrf_controller.rb', <<-FILE
-class Api::CsrfController < ApplicationController
-  skip_before_action :authenticate, only: [:index]
-
-  def index
-    render json: { request_forgery_protection_token => form_authenticity_token }.to_json
-  end
-end
-FILE
-
+# Ember Deployment (ember-cli-rails)
 inside "#{ember_app}" do
-  run 'npm install  --save-dev rails-csrf'
+  run 'ember install ember-cli-rails-addon@0.7.0'
 end
 
-file "#{ember_app}/app/routes/application.js", <<-FILE
-import Ember from 'ember';
+file "#{ember_app}/app/adapters/application.js", <<-FILE
+import AuthenticatedAdapter from 'ember-authenticate-me/adapters/authenticated';
+import ENV from '../config/environment';
 
-export default Ember.Route.extend({
-  beforeModel: function() {
-    return this.csrf.fetchToken();
-  }
+export default AuthenticatedAdapter.extend({
+  namespace: ENV.apiNamespace || 'api/v1',
+  coalesceFindRequests: true,
 });
 FILE
 
-inject_into_file "#{ember_app}/app/app.js", after: 'loadInitializers(App, config.modulePrefix);' do
-  "\nloadInitializers(App, 'rails-csrf');"
-end
+file "#{ember_app}/app/serializers/application.js", <<-FILE
+import DS from 'ember-data';
+ 
+export default DS.ActiveModelSerializer.extend({
+  attrs: {
+    createdAt: { serialize: false },
+    updatedAt: { serialize: false },
+  },
+});
+FILE
 
 ###
 # Recipes
@@ -222,6 +370,7 @@ run 'rails g api_me:policy user username email password password_confirmation'
 #end
 run 'rails g api_me:filter user'
 run 'user username email created_at updated_at'
+
 # Ember part
 inside "#{ember_app}" do
   run 'ember install  ember-authenticate-me'

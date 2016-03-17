@@ -20,4 +20,5 @@ Repository for the <app-name> project
 ## Production Requirements
 ### Enviroment varables
 - `SECRET_KEY_BASE`
+- `SKIP_EMBER=true`
 
