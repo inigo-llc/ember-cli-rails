@@ -10,6 +10,9 @@ capybara-*.html
 **.orig
 rerun.txt
 pickle-email-*.html
+.env
+.DS_Store
+*.swp
 
 ## Environment normalisation:
 /.bundle
