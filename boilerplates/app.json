@@ -1,0 +1,55 @@
+{
+  "name": "<app-name>",
+  "scripts": {
+    "postdeploy": "rake db:setup && rake demo:seed"
+  },
+  "env": {
+    "LANG": {
+      "required": true
+    },
+    "RACK_ENV": {
+      "required": true
+    },
+    "RAILS_ENV": {
+      "required": true
+    },
+    "RAILS_SERVE_STATIC_FILES": {
+      "required": true,
+      "value": "enabled"
+    },
+    "SECRET_KEY_BASE": {
+      "required": true
+    },
+    "NPM_CONFIG_PRODUCTION": {
+      "required": true
+    },
+    "AWS_ACCESS_KEY_ID": {
+      "required": true
+    },
+    "AWS_S3_CACHE_BUCKET_NAME": {
+      "required": true
+    },
+    "AWS_S3_DOWNLOAD_BUCKET_NAME": {
+      "required": true
+    },
+    "AWS_REGION": {
+      "required": true
+    },
+    "AWS_SECRET_ACCESS_KEY": {
+      "required": true
+    },
+    "WILDLAND_STATUS_BAR": "development"
+  },
+  "addons": [
+    "heroku-postgresql",
+    "sendgrid:starter"
+  ],
+  "buildpacks": [
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-nodejs"
+    },
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-ruby"
+    }
+  ]
+}
