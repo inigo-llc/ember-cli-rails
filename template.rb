@@ -11,7 +11,7 @@
 ruby_version = '2.3.1'
 node_version = 'v4.5.0'
 action_messages = []
-branch = 'master'
+branch = 'cleanup-updates'
 
 # Initialize git repo
 git :init
@@ -69,6 +69,8 @@ end
 gem_group :production do
   gem 'rails_12factor'
 end
+
+gem 'pg'
 # Install Squeel
 gem 'squeel'
 gem 'factory_girl_rails'
@@ -81,6 +83,7 @@ gem_group :development, :test do
   gem 'wildland_dev_tools', '>=0.1.0', git: 'git+ssh://git@github.com/wildland/wildland_dev_tools.git'
   gem 'annotate'
   gem 'brakeman'
+  gem 'faker'
   gem 'pry-rails'
   gem 'pry-byebug'
   gem 'rspec-rails'
@@ -135,6 +138,7 @@ run 'chmod u+x bin/log'
 
 # Ember cli
 run "curl -o config/initializers/ember.rb 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/ember-cli-config.rb'"
+run 'mkdir app/views/ember_cli/ && mkdir app/views/ember_cli/ember'
 run "curl -o app/views/ember_cli/ember/index.html.erb 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/ember-cli-index.erb'"
 
 inject_into_file 'config/secrets.yml', after: 'production:' do
@@ -199,7 +203,9 @@ inside "#{ember_app}" do
   run 'ember install ember-cli-rails-addon@0.7.0'
 end
 
+run "mkdir #{ember_app}/app/adapters/"
 run "curl -o #{ember_app}/app/adapters/application.js 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/adapter.js'"
+run "mkdir #{ember_app}/app/serializers/"
 run "curl -o #{ember_app}/app/serializers/application.js 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/serializer.js'"
 
 ###
