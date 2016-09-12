@@ -185,6 +185,12 @@ run "ember new #{ember_app}"
 run "rm -rf #{ember_app}/.git/"
 run "rm #{ember_app}/.ember-cli"
 
+# Correct minor version bugs
+inside "#{ember_app}" do
+  gsub_file 'bower.json', /"jquery": "\^1.11.3",/, '"jquery": "1.11.3",'
+  run 'bower install'
+end
+
 create_file "#{ember_app}/.nvmrc" do
   node_version
 end
@@ -218,7 +224,7 @@ run 'bundle install'
 run 'rails g api_me:install'
 
 # Token Authentication Installation and Setup (token_authenticate_me and ember-authenticate-me)
-gem 'token_authenticate_me', '~>0.5.2'
+gem 'token_authenticate_me', '~>0.4.3'
 run 'bundle install'
 run 'rails g token_authenticate_me:install'
 run 'rake db:migrate'
@@ -230,8 +236,9 @@ run 'rails g api_me:policy user username email password password_confirmation'
 
 # Ember part
 inside "#{ember_app}" do
-  run 'ember install ember-authenticate-me@0.5.0'
+  run 'ember install ember-authenticate-me@0.4.0'
   run 'ember generate user'
+  run 'ember g ember-authenticate-me'
 end
 
 git add: '.'

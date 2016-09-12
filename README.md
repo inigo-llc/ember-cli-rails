@@ -20,6 +20,10 @@ You will need the usual [development setup](https://github.com/wildland/guides#s
 
 ## Usage
 Ensure that you have `rails 4.2.x` installed in your global gems. You can check this with `rails -v`.
+You can install this with `gem install rails -v 4.2.7`.
+
+Ensure that you have `ember 1.13.13` installed in your global npm. You can check this with `ember -v`.
+You can install this with `npm install -g ember-cli@1.13.13`.
 
 ```bash
 $ rails new <app-name> -m https://raw.githubusercontent.com/wildland/ember-cli-rails/master/template.rb --database=postgresql --skip-spring --skip-turbolinks -J
