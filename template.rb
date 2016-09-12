@@ -80,7 +80,7 @@ gem "ember-cli-rails", '~> 0.8.0'
 
 # Install development and test gems
 gem_group :development, :test do
-  gem 'wildland_dev_tools', '>=0.1.0', git: 'git+ssh://git@github.com/wildland/wildland_dev_tools.git'
+  gem 'wildland_dev_tools', '~>0.7.0', git: 'git+ssh://git@github.com/wildland/wildland_dev_tools.git'
   gem 'annotate'
   gem 'brakeman'
   gem 'faker'
@@ -213,12 +213,12 @@ run "curl -o #{ember_app}/app/serializers/application.js 'https://raw.githubuser
 ###
 
 # api_me installation
-gem 'api_me'
+gem 'api_me', '~>0.7.0'
 run 'bundle install'
 run 'rails g api_me:install'
 
 # Token Authentication Installation and Setup (token_authenticate_me and ember-authenticate-me)
-gem 'token_authenticate_me', '>=0.4.2'
+gem 'token_authenticate_me', '~>0.5.2'
 run 'bundle install'
 run 'rails g token_authenticate_me:install'
 run 'rake db:migrate'
@@ -230,7 +230,7 @@ run 'rails g api_me:policy user username email password password_confirmation'
 
 # Ember part
 inside "#{ember_app}" do
-  run 'ember install  ember-authenticate-me'
+  run 'ember install ember-authenticate-me@0.5.0'
   run 'ember generate user'
 end
 
