@@ -26,7 +26,7 @@ Ensure that you have `ember 1.13.13` installed in your global npm. You can check
 You can install this with `npm install -g ember-cli@1.13.13`.
 
 ```bash
-$ rails new <app-name> -m https://raw.githubusercontent.com/wildland/ember-cli-rails/master/template.rb --database=postgresql --skip-spring --skip-turbolinks -J
+$ rails new <app-name> -m https://raw.githubusercontent.com/wildland/trailhead/master/template.rb --database=postgresql --skip-spring --skip-turbolinks -J
 ```
 
 You now have a rails project with an ember-cli project within it.
