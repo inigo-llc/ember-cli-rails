@@ -8,10 +8,10 @@
 # This template assumes you have followed the setup guide at:
 # https://github.com/wildland/guides/#setting-up-your-development-enviroment
 #
-ruby_version = '2.2.3'
-node_version = 'v5.4.0'
+ruby_version = '2.3.1'
+node_version = 'v4.5.0'
 action_messages = []
-branch = 'master'
+branch = 'cleanup-updates'
 
 # Initialize git repo
 git :init
@@ -19,20 +19,20 @@ git add: '.'
 git commit: "-m 'Initial commit.'"
 
 # Download the most recent gitignore boilerplate
-run "curl -o .gitignore 'https://raw.githubusercontent.com/wildland/ember-cli-rails/#{branch}/gitignore_boilerplate'"
+run "curl -o .gitignore 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/gitignore'"
 
 # Remove normal readme
 run 'rm README.rdoc'
 
 # Download the most recent README boilerplate
-run "curl -o README.md 'https://raw.githubusercontent.com/wildland/ember-cli-rails/#{branch}/readme_boilerplate'"
+run "curl -o README.md 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/readme'"
 # Fill in README template
 gsub_file 'README.md', /<app-name>/, "#{@app_name}"
 gsub_file 'README.md', /<ruby-version>/, ruby_version
 gsub_file 'README.md', /<node-version>/, node_version
 
 # Download the most recent rubocop boilerplate
-run "curl -o .rubocop.yml 'https://raw.githubusercontent.com/wildland/ember-cli-rails/master/rubocop_boilerplate'"
+run "curl -o .rubocop.yml 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/rubocop'"
 
 # Create ruby and node version files
 create_file '.ruby-version' do
@@ -40,10 +40,6 @@ create_file '.ruby-version' do
 end
 create_file '.nvmrc' do
   node_version
-end
-
-create_file 'Procfile' do
-
 end
 
 # Update to latest patch version of rails
@@ -58,6 +54,10 @@ run "sed -i.bak '/Use SCSS/d' Gemfile"
 
 run "sed -i.bak '/uglifier/d' Gemfile"
 run "sed -i.bak '/Use Uglifier/d' Gemfile"
+
+run "sed -i.bak '/turbolinks/d' Gemfile"
+run "sed -i.bak '/Turbolinks makes/d' Gemfile"
+
 # cleanup
 run 'rm Gemfile.bak'
 
@@ -69,18 +69,21 @@ end
 gem_group :production do
   gem 'rails_12factor'
 end
+
+gem 'pg'
 # Install Squeel
 gem 'squeel'
 gem 'factory_girl_rails'
 gem 'mailcatcher'
 gem 'puma'
-gem "ember-cli-rails", '~> 0.7.1'
+gem "ember-cli-rails", '~> 0.8.0'
 
 # Install development and test gems
 gem_group :development, :test do
-  gem 'wildland_dev_tools', '>=0.1.0', git: 'git+ssh://git@github.com/wildland/wildland_dev_tools.git'
+  gem 'wildland_dev_tools', '~>0.7.0', git: 'git+ssh://git@github.com/wildland/wildland_dev_tools.git'
   gem 'annotate'
   gem 'brakeman'
+  gem 'faker'
   gem 'pry-rails'
   gem 'pry-byebug'
   gem 'rspec-rails'
@@ -100,135 +103,43 @@ gsub_file 'spec/rails_helper.rb', /# Dir\[Rails\.root\.join/, 'Dir[Rails.root.jo
 # Remove test folder
 run 'rm -rf test/'
 
-# Add heroku buildpacks for heroku deployment
-file '.buildpacks', <<-FILE
-https://github.com/heroku/heroku-buildpack-ruby.git
-https://github.com/heroku/heroku-buildpack-nodejs.git
-FILE
+# Download the most recent buildpack boilerplate
+run "curl -o .buildpacks 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/buildpacks'"
+# Fill in README template
+gsub_file '.buildpacks', /<app-name>/, "#{@app_name}"
 
-# Setup default app.json for heroku deployments
-file 'app.json', <<-FILE
-{
-  "name": "#{@app_name}",
-  "scripts": {
-    "postdeploy": "rake db:setup && rake demo:seed"
-  },
-  "env": {
-    "LANG": {
-      "required": true
-    },
-    "RACK_ENV": {
-      "required": true
-    },
-    "RAILS_ENV": {
-      "required": true
-    },
-    "RAILS_SERVE_STATIC_FILES": {
-      "required": true
-    },
-    "SECRET_KEY_BASE": {
-      "required": true
-    },
-    "NPM_CONFIG_PRODUCTION": {
-      "required": true
-    },
-    "WILDLAND_STATUS_BAR": "development"
-  },
-  "addons": [
-    "heroku-postgresql",
-    "sendgrid:starter"
-  ],
-  "buildpacks": [
-    {
-      "url": "https://github.com/heroku/heroku-buildpack-nodejs"
-    },
-    {
-      "url": "https://github.com/heroku/heroku-buildpack-ruby"
-    }
-  ]
-}
-FILE
+# Download the most recent app.json boilerplate
+run "curl -o app.json 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/app.json'"
+# Fill in README template
+gsub_file 'app.json', /<app-name>/, "#{@app_name}"
 
-file '.env', <<-FILE
-SKIP_EMBER=true
-FILE
+# Download the most recent app.json boilerplate
+run "curl -o .env 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/env'"
 
-# Setup Procfile to handle auto starting all entire app all at once
-file 'Procfile', <<-FILE
-web: bundle exec puma -C config/puma.rb
-log: bin/log
-mailcatcher: bin/mailcatcher
-ember: bin/ember
-FILE
+# Download the most recent Procfile boilerplate
+run "curl -o Procfile 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/Procfile'"
 
 
-# Setup puma
-file 'config/puma.rb', <<-FILE
-workers Integer(ENV['WEB_CONCURRENCY'] || 2)
-threads_count = Integer(ENV['MAX_THREADS'] || 5)
-threads threads_count, threads_count
+# Download the most recent Puma config boilerplate
+run "curl -o config/puma.rb 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/puma_config.rb'"
 
-preload_app!
-
-rackup      DefaultRackup
-port        ENV['PORT']     || 5000
-environment ENV['RACK_ENV'] || 'development'
-
-on_worker_boot do
-  # Worker specific setup for Rails 4.1+
-  # See: https://devcenter.heroku.com/articles/deploying-rails-applications-with-the-puma-web-server#on-worker-boot
-  ActiveRecord::Base.establish_connection
-end
-FILE
-
-# Setup ember launcher script
-file 'bin/ember', <<-FILE
-#!/bin/sh
-if [ ${RACK_ENV:=development} == "development" ]; then
-  cd app-ember
-  ember server --proxy http://localhost:5000 --port 4200
-fi
-FILE
+# Download the most recent Ember launcher boilerplate
+run "curl -o bin/ember 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/bin_ember'"
 run 'chmod u+x bin/ember'
 
-# Setup mailcatcher launcher script
-file 'bin/mailcatcher', <<-FILE
-#!/bin/sh
-if [ ${RACK_ENV:=development} == "development" ]; then
-  bundle exec mailcatcher -f
-fi
-FILE
+
+# Download the most recent Mailcatcher launcher boilerplate
+run "curl -o bin/mailcatcher 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/bin_mailcatcher'"
 run 'chmod u+x bin/mailcatcher'
 
-file 'config/initializers/ember.rb', <<-FILE
-EmberCli.configure do |c|
-  c.app :frontend, path: './app-ember'
-end
-FILE
+# Download the most recent log launcher boilerplate
+run "curl -o bin/log 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/bin_log'"
+run 'chmod u+x bin/log'
 
-file 'app/views/ember_cli/ember/index.html.erb', <<-FILE
-<%= render_ember_app ember_app do |head, body| %>
-  <% head.append do %>
-    <%= csrf_meta_tags %>
-  <% end %>
-  <% body.append do %>
-    <% if Rails.application.secrets.wildland_server_status == 'development' %>
-      <div id="pipeline-flag">
-        <div class="development-flag">
-          <p>Development</p>
-        </div>
-      </div>
-    <% end %>
-    <% if Rails.application.secrets.wildland_server_status == 'staging' %>
-      <div id="pipeline-flag">
-        <div class="staging-flag">
-          <p>Staging</p>
-        </div>
-      </div>
-    <% end %>
-  <% end %>
-<% end %>
-FILE
+# Ember cli
+run "curl -o config/initializers/ember.rb 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/ember-cli-config.rb'"
+run 'mkdir app/views/ember_cli/ && mkdir app/views/ember_cli/ember'
+run "curl -o app/views/ember_cli/ember/index.html.erb 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/ember-cli-index.erb'"
 
 inject_into_file 'config/secrets.yml', after: 'production:' do
   "\n  wildland_server_status: <%= ENV['WILDLAND_STATUS_BAR'] %>"
@@ -244,22 +155,7 @@ inject_into_file 'app/controllers/application_controller.rb', after: 'class Appl
 end
 
 # Setup factory_girl
-file 'spec/support/factory_girl.rb', <<-FILE
-RSpec.configure do |config|
-  config.include FactoryGirl::Syntax::Methods
-end
-FILE
-
-# Add seed task
-create_file 'lib/tasks/demo.rake' do
-  %q(require 'factory_girl'
-
-  namespace :demo do
-    task seed: :environment do
-      # Add any seed information here
-    end
-  end)
-end
+run "curl -o lib/tasks/demo.rake 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/demo.rake'"
 
 # Initialize the database
 run 'rake db:create'
@@ -270,13 +166,7 @@ inject_into_file 'app/controllers/application_controller.rb', after: 'class Appl
 end
 
 # Add ember controller
-file 'app/controllers/ember_application_controller.rb', <<-FILE
-class EmberApplicationController < ApplicationController
-  def index
-    render file: 'public/index.html'
-  end
-end
-FILE
+run "curl -o app/controllers/ember_application_controller.rb 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/ember_application_controller.rb'"
 
 # Remove Comments and empty lines
 gsub_file 'config/routes.rb', /^(  #.*\n)|(\n)/, ''
@@ -295,23 +185,19 @@ run "ember new #{ember_app}"
 run "rm -rf #{ember_app}/.git/"
 run "rm #{ember_app}/.ember-cli"
 
+# Correct minor version bugs
+inside "#{ember_app}" do
+  gsub_file 'bower.json', /"jquery": "\^1.11.3",/, '"jquery": "1.11.3",'
+  run 'bower install'
+end
+
 create_file "#{ember_app}/.nvmrc" do
   node_version
 end
 
 # Create the file that sets the default ember serve options (like the proxy)
-file "#{ember_app}/.ember-cli", <<-FILE
-{
-  /**
-    Ember CLI sends analytics information by default. The data is completely
-    anonymous, but there are times when you might want to disable this behavior.
-
-    Setting `disableAnalytics` to true will prevent any data from being sent.
-  */
-  "disableAnalytics": false,
-  "proxy": "http://localhost:3000"
-}
-FILE
+# Add ember controller
+run "curl -o #{ember_app}/.ember-cli 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/ember-cli'"
 
 inject_into_file 'config/routes.rb',
                  before: '  # Clobbers all routes, Keep this as the last route in the routes file' do
@@ -323,63 +209,36 @@ inside "#{ember_app}" do
   run 'ember install ember-cli-rails-addon@0.7.0'
 end
 
-file "#{ember_app}/app/adapters/application.js", <<-FILE
-import AuthenticatedAdapter from 'ember-authenticate-me/adapters/authenticated';
-import ENV from '../config/environment';
-
-export default AuthenticatedAdapter.extend({
-  namespace: ENV.apiNamespace || 'api/v1',
-  coalesceFindRequests: true,
-});
-FILE
-
-file "#{ember_app}/app/serializers/application.js", <<-FILE
-import DS from 'ember-data';
- 
-export default DS.ActiveModelSerializer.extend({
-  attrs: {
-    createdAt: { serialize: false },
-    updatedAt: { serialize: false },
-  },
-});
-FILE
+run "mkdir #{ember_app}/app/adapters/"
+run "curl -o #{ember_app}/app/adapters/application.js 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/adapter.js'"
+run "mkdir #{ember_app}/app/serializers/"
+run "curl -o #{ember_app}/app/serializers/application.js 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/serializer.js'"
 
 ###
 # Recipes
 ###
 
 # api_me installation
-gem 'api_me'
+gem 'api_me', '~>0.7.0'
 run 'bundle install'
 run 'rails g api_me:install'
 
 # Token Authentication Installation and Setup (token_authenticate_me and ember-authenticate-me)
-gem 'token_authenticate_me', '>=0.4.2'
+gem 'token_authenticate_me', '~>0.4.3'
 run 'bundle install'
-run 'rails g token_authenticate_me:install user'
+run 'rails g token_authenticate_me:install'
 run 'rake db:migrate'
-inject_into_file 'app/controllers/application_controller.rb', before: 'class' do
-  "require 'token_authenticate_me/controllers/token_authenticateable'\n"
-end
-inject_into_file 'app/controllers/application_controller.rb', after: 'with: :exception' do
-  "\n  include TokenAuthenticateMe::Controllers::TokenAuthenticateable\n"
-end
+
 run 'rails g api_me:policy user username email password password_confirmation'
 #inject_into_class 'app/policies/user_policy.rb', UserPolicy do
 #  "  def create?\n    true\n  end\n"
 #end
-run 'rails g api_me:filter user'
-run 'user username email created_at updated_at'
 
 # Ember part
 inside "#{ember_app}" do
-  run 'ember install  ember-authenticate-me'
+  run 'ember install ember-authenticate-me@0.4.0'
   run 'ember generate user'
-end
-
-# Ember Authorization (ember-sanctify)
-inside "#{ember_app}" do
-  run 'ember install ember-sanctify'
+  run 'ember g ember-authenticate-me'
 end
 
 git add: '.'

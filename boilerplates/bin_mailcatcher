@@ -1,0 +1,8 @@
+#!/bin/sh
+if [ ${RACK_ENV:=development} == "development" ]; then
+  if pgrep "mailcatcher" > /dev/null
+  then
+      kill $(pgrep "mailcatcher")
+  fi
+  bundle exec mailcatcher -f
+fi
