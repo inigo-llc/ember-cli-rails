@@ -80,7 +80,7 @@ gem "ember-cli-rails", '~> 0.8.0'
 
 # Install development and test gems
 gem_group :development, :test do
-  gem 'wildland_dev_tools', '~>0.8.0', git: 'git+ssh://git@github.com/wildland/wildland_dev_tools.git'
+  gem 'wildland_dev_tools', git: 'git+ssh://git@github.com/wildland/wildland_dev_tools.git', :tag => 'v0.8.0'
   gem 'annotate'
   gem 'brakeman'
   gem 'faker'
