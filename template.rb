@@ -9,9 +9,9 @@
 # https://github.com/wildland/guides/#setting-up-your-development-enviroment
 #
 ruby_version = '2.3.1'
-node_version = 'v4.5.0'
+node_version = 'v6.3.1'
 action_messages = []
-branch = 'cleanup-updates'
+branch = 'ember-update'
 
 # Initialize git repo
 git :init

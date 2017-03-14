@@ -42,7 +42,8 @@
   },
   "addons": [
     "heroku-postgresql",
-    "sendgrid:starter"
+    "sendgrid:starter",
+    
   ],
   "buildpacks": [
     {
