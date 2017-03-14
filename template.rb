@@ -9,9 +9,10 @@
 # https://github.com/wildland/guides/#setting-up-your-development-enviroment
 #
 ruby_version = '2.3.1'
-node_version = 'v4.5.0'
+node_version = 'v6.9.5'
 action_messages = []
-branch = 'cleanup-updates'
+branch = 'latest-updates'
+ember_app = 'app-ember'
 
 # Initialize git repo
 git :init
@@ -20,6 +21,7 @@ git commit: "-m 'Initial commit.'"
 
 # Download the most recent gitignore boilerplate
 run "curl -o .gitignore 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/gitignore'"
+run "curl -o .editorconfig 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/editorconfig'"
 
 # Remove normal readme
 run 'rm README.rdoc'
@@ -77,6 +79,7 @@ gem 'factory_girl_rails'
 gem 'mailcatcher'
 gem 'puma'
 gem "ember-cli-rails", '~> 0.8.0'
+gem 'active_model_serializers', '~> 0.10.2'
 
 # Install development and test gems
 gem_group :development, :test do
@@ -136,6 +139,17 @@ run 'chmod u+x bin/mailcatcher'
 run "curl -o bin/log 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/bin_log'"
 run 'chmod u+x bin/log'
 
+# Configure AMS
+run "curl -o config/initializers/active_model_serializers.rb 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/active_model_serializers_config.rb'"
+
+# Configure Base API Controller
+run "mkdir -p app/controllers/api/v1"
+run "curl -o app/controllers/api/v1/base_api_controller.rb 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/base_api_controller.rb'"
+
+# Configure Session Serializer
+run "mkdir -p app/serializers/token_authenticate_me"
+run "curl -o app/serializers/token_authenticate_me/session_serializer.rb 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/session_serializer.rb'"
+
 # Ember cli
 run "curl -o config/initializers/ember.rb 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/ember-cli-config.rb'"
 run 'mkdir app/views/ember_cli/ && mkdir app/views/ember_cli/ember'
@@ -158,8 +172,8 @@ end
 run "curl -o lib/tasks/demo.rake 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/demo.rake'"
 
 # Initialize the database
-run 'rake db:create'
-run 'rake db:migrate'
+run 'bundle exec rake db:create'
+run 'bundle exec rake db:migrate'
 
 inject_into_file 'app/controllers/application_controller.rb', after: 'class ApplicationController < ActionController::Base' do
   "\n  force_ssl if Rails.env.production?\n"
@@ -175,8 +189,6 @@ inject_into_file 'config/routes.rb', after: 'do' do
 end
 route "mount_ember_app :frontend, to: '/', controller: 'ember_application'"
 route '# Clobbers all routes, Keep this as the last route in the routes file'
-
-ember_app = 'app-ember'
 
 # create ember-cli app
 run "ember new #{ember_app}"
@@ -219,15 +231,15 @@ run "curl -o #{ember_app}/app/serializers/application.js 'https://raw.githubuser
 ###
 
 # api_me installation
-gem 'api_me', '~>0.7.0'
+gem 'api_me', '~>0.8.2'
 run 'bundle install'
 run 'rails g api_me:install'
 
 # Token Authentication Installation and Setup (token_authenticate_me and ember-authenticate-me)
-gem 'token_authenticate_me', '~>0.4.3'
+gem 'token_authenticate_me', '~>0.5.5'
 run 'bundle install'
 run 'rails g token_authenticate_me:install'
-run 'rake db:migrate'
+run 'bundle exec rake db:migrate'
 
 run 'rails g api_me:policy user username email password password_confirmation'
 #inject_into_class 'app/policies/user_policy.rb', UserPolicy do
@@ -236,9 +248,44 @@ run 'rails g api_me:policy user username email password password_confirmation'
 
 # Ember part
 inside "#{ember_app}" do
-  run 'ember install ember-authenticate-me@0.4.0'
-  run 'ember generate user'
+  run 'ember install ember-cli-sass'
+  run 'ember install ember-cli-bootstrap-sassy'
+  run 'ember install ember-freestyle'
+  run 'ember install torii'
+
+  run 'npm install --save-dev wildland/ember-bootstrap-controls#ember-cli-updates'
+  run 'ember g ember-bootstrap-controls'
+
+  run 'npm install --save-dev wildland/ember-authenticate-me#ember-update'
   run 'ember g ember-authenticate-me'
+
+  run 'rm app/styles/app.css'
+end
+
+# Copy default app.scss file
+run "curl -o app-ember/app/styles/app.scss 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/app.scss'"
+run "touch app-ember/app/styles/_variables.scss"
+
+inject_into_file(
+  "#{ember_app}/ember-cli-build.js",
+  after: '// Add options here'
+) do
+<<-JS
+
+    'ember-bootstrap': {
+      importBootstrapFont: true,
+      importBootstrapCSS: false
+    },
+    emberAuthenticateMe: {
+      importCSS: true
+    },
+    'ember-power-select': {
+      theme: 'bootstrap'
+    },
+    babel: {
+      includePolyfill: true,
+    }
+JS
 end
 
 git add: '.'
