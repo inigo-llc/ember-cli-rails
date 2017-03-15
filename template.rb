@@ -9,9 +9,9 @@
 # https://github.com/wildland/guides/#setting-up-your-development-enviroment
 #
 ruby_version = '2.3.1'
-node_version = 'v6.3.1'
+node_version = 'v6.9.5'
 action_messages = []
-branch = 'ember-update'
+branch = 'ember-updates'
 
 # Initialize git repo
 git :init
@@ -77,6 +77,7 @@ gem 'factory_girl_rails'
 gem 'mailcatcher'
 gem 'puma'
 gem "ember-cli-rails", '~> 0.8.0'
+gem 'active_model_serializers', '~> 0.10.2'
 
 # Install development and test gems
 gem_group :development, :test do
@@ -219,12 +220,12 @@ run "curl -o #{ember_app}/app/serializers/application.js 'https://raw.githubuser
 ###
 
 # api_me installation
-gem 'api_me', '~>0.7.0'
+gem 'api_me', '~>0.8.2'
 run 'bundle install'
 run 'rails g api_me:install'
 
 # Token Authentication Installation and Setup (token_authenticate_me and ember-authenticate-me)
-gem 'token_authenticate_me', '~>0.4.3'
+gem 'token_authenticate_me', '~>0.5.5'
 run 'bundle install'
 run 'rails g token_authenticate_me:install'
 run 'rake db:migrate'
@@ -236,8 +237,7 @@ run 'rails g api_me:policy user username email password password_confirmation'
 
 # Ember part
 inside "#{ember_app}" do
-  run 'ember install ember-authenticate-me@0.4.0'
-  run 'ember generate user'
+  run 'npm install --save-dev wildland/ember-authenticate-me#ember-update'
   run 'ember g ember-authenticate-me'
 end
 
