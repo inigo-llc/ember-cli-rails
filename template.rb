@@ -11,7 +11,7 @@
 ruby_version = '2.3.1'
 node_version = 'v6.9.5'
 action_messages = []
-branch = 'latest-updates'
+branch = 'master'
 ember_app = 'app-ember'
 
 # Initialize git repo
@@ -253,10 +253,10 @@ inside "#{ember_app}" do
   run 'ember install ember-freestyle'
   run 'ember install torii'
 
-  run 'npm install --save-dev wildland/ember-bootstrap-controls#ember-cli-updates'
+  run 'npm install --save-dev wildland/ember-bootstrap-controls#v0.12.0'
   run 'ember g ember-bootstrap-controls'
 
-  run 'npm install --save-dev wildland/ember-authenticate-me#ember-update'
+  run 'npm install --save-dev wildland/ember-authenticate-me#v0.7.0'
   run 'ember g ember-authenticate-me'
 
   run 'rm app/styles/app.css'
