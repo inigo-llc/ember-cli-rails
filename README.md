@@ -22,8 +22,8 @@ You will need the usual [development setup](https://github.com/wildland/guides#s
 Ensure that you have `rails 4.2.x` installed in your global gems. You can check this with `rails -v`.
 You can install this with `gem install rails -v 4.2.7`.
 
-Ensure that you have `ember 1.13.13` installed in your global npm. You can check this with `ember -v`.
-You can install this with `npm install -g ember-cli@1.13.13`.
+Ensure that you have `ember-cli 2.12.1` installed in your global npm. You can check this with `ember -v`.
+You can install this with `npm install -g ember-cli@2.12.1`.
 
 ```bash
 $ rails new <app-name> -m https://raw.githubusercontent.com/wildland/trailhead/master/template.rb --database=postgresql --skip-spring --skip-turbolinks -J
