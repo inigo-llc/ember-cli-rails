@@ -13,7 +13,7 @@ You will need the usual [development setup](https://github.com/wildland/guides#s
 - ruby (2.3.1)
   - bundler
   - rails
-- node (v4.5.0)
+- node (v6.9.5)
   - npm
   - bower
   - ember-cli
