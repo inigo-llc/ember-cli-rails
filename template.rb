@@ -191,7 +191,7 @@ route "mount_ember_app :frontend, to: '/', controller: 'ember_application'"
 route '# Clobbers all routes, Keep this as the last route in the routes file'
 
 # create ember-cli app
-run "ember new #{ember_app}"
+run "ember new #{ember_app} --yarn"
 
 # Remove the sub-git project created
 run "rm -rf #{ember_app}/.git/"
