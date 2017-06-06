@@ -27,7 +27,7 @@ run "curl -o .editorconfig 'https://raw.githubusercontent.com/wildland/trailhead
 run 'rm README.rdoc'
 
 # Download the most recent README boilerplate
-run "curl -o README.md 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/readme'"
+run "curl -o README.md 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/readme.md'"
 # Fill in README template
 gsub_file 'README.md', /<app-name>/, "#{@app_name}"
 gsub_file 'README.md', /<ruby-version>/, ruby_version
