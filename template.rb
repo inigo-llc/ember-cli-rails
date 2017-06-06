@@ -197,12 +197,6 @@ run "ember new #{ember_app}"
 run "rm -rf #{ember_app}/.git/"
 run "rm #{ember_app}/.ember-cli"
 
-# Correct minor version bugs
-inside "#{ember_app}" do
-  gsub_file 'bower.json', /"jquery": "\^1.11.3",/, '"jquery": "1.11.3",'
-  run 'bower install'
-end
-
 create_file "#{ember_app}/.nvmrc" do
   node_version
 end
