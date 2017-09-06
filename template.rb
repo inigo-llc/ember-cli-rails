@@ -11,7 +11,7 @@
 ruby_version = '2.3.1'
 node_version = 'v6.9.5'
 action_messages = []
-branch = 'ember-cli-updates'
+branch = 'master'
 ember_app = 'app-ember'
 
 # Initialize git repo
