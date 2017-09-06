@@ -27,7 +27,7 @@ run "curl -o .editorconfig 'https://raw.githubusercontent.com/wildland/trailhead
 run 'rm README.rdoc'
 
 # Download the most recent README boilerplate
-run "curl -o README.md 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/readme'"
+run "curl -o README.md 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/readme.md'"
 # Fill in README template
 gsub_file 'README.md', /<app-name>/, "#{@app_name}"
 gsub_file 'README.md', /<ruby-version>/, ruby_version
@@ -196,12 +196,6 @@ run "ember new #{ember_app}"
 # Remove the sub-git project created
 run "rm -rf #{ember_app}/.git/"
 run "rm #{ember_app}/.ember-cli"
-
-# Correct minor version bugs
-inside "#{ember_app}" do
-  gsub_file 'bower.json', /"jquery": "\^1.11.3",/, '"jquery": "1.11.3",'
-  run 'bower install'
-end
 
 create_file "#{ember_app}/.nvmrc" do
   node_version
