@@ -10,10 +10,10 @@ building and testing your rails app.
 
 You will need the usual [development setup](https://github.com/wildland/guides#setting-up-your-development-enviroment):
 - git
-- ruby (2.3.1)
+- ruby (2.4.1)
   - bundler
   - rails
-- node (v6.9.5)
+- node (v6.11.3)
   - npm
   - bower
   - ember-cli

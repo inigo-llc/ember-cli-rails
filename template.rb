@@ -23,9 +23,6 @@ git commit: "-m 'Initial commit.'"
 run "curl -o .gitignore 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/gitignore'"
 run "curl -o .editorconfig 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/editorconfig'"
 
-# Remove normal readme
-run 'rm README.rdoc'
-
 # Download the most recent README boilerplate
 run "curl -o README.md 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/readme.md'"
 # Fill in README template
@@ -45,7 +42,7 @@ create_file '.nvmrc' do
 end
 
 # Update to latest patch version of rails
-gsub_file 'gemfile', /gem 'rails', '/, "gem 'rails', '~>"
+# gsub_file 'gemfile', /gem 'rails', '/, "gem 'rails', '~>"
 
 # kill un-needed gems
 
@@ -78,7 +75,7 @@ gem 'squeel'
 gem 'factory_girl_rails'
 gem 'mailcatcher'
 gem 'puma'
-gem "ember-cli-rails", '~> 0.8.0'
+gem "ember-cli-rails", '~> 0.10.0'
 gem 'active_model_serializers', '~> 0.10.2'
 
 # Install development and test gems
@@ -230,7 +227,7 @@ run 'bundle install'
 run 'rails g api_me:install'
 
 # Token Authentication Installation and Setup (token_authenticate_me and ember-authenticate-me)
-gem 'token_authenticate_me', '~>0.5.5'
+gem 'token_authenticate_me', '~>0.6.0'
 run 'bundle install'
 run 'rails g token_authenticate_me:install'
 run 'bundle exec rake db:migrate'
