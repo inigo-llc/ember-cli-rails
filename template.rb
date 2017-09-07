@@ -8,11 +8,29 @@
 # This template assumes you have followed the setup guide at:
 # https://github.com/wildland/guides/#setting-up-your-development-enviroment
 #
-ruby_version = '2.3.1'
-node_version = 'v6.9.5'
+require 'pry'
+ruby_version = '2.3.4'
+node_version = 'v6.11.3'
+rails_version = '4.2.7.1'
+ember_cli_version = '2.15.1'
 action_messages = []
 branch = 'master'
 ember_app = 'app-ember'
+
+# Preflight check
+begin
+  current_ruby_version = `ruby -v`
+  raise "Requires ruby #{ruby_version}" unless current_ruby_version.include?(ruby_version.gsub('x','').strip)
+  current_node_version = `node -v`
+  raise "Requires node #{node_version}" unless current_node_version.include?(node_version.gsub('x','').strip)
+  current_rails_version = Rails.version
+  raise "Requires rails #{rails_version}" unless current_rails_version.include?(rails_version.gsub('x','').strip)
+  current_ember_version = `ember -v`
+  raise "Requires ember-cli #{ember_cli_version}" unless current_ember_version.include?("ember-cli: #{ember_cli_version.gsub('x','').strip}")
+rescue => e
+  remove_dir destination_root
+  abort e.message
+end
 
 # Initialize git repo
 git :init
@@ -71,16 +89,20 @@ end
 
 gem 'pg'
 # Install Squeel
-gem 'squeel'
+if yes? ('Use baby_squeel instead of squeel?')
+  gem 'baby_squeel'
+else
+  gem 'squeel'
+end
 gem 'factory_girl_rails'
 gem 'mailcatcher'
 gem 'puma'
 gem "ember-cli-rails", '~> 0.10.0'
-gem 'active_model_serializers', '~> 0.10.2'
+gem 'active_model_serializers', '~> 0.10.6'
 
 # Install development and test gems
 gem_group :development, :test do
-  gem 'wildland_dev_tools', github: 'wildland/wildland_dev_tools', tag: 'v0.8.0'
+  gem 'wildland_dev_tools'
   gem 'annotate'
   gem 'brakeman'
   gem 'faker'
@@ -99,7 +121,7 @@ run 'rails generate annotate:install'
 # Setup rspec
 run 'rails generate rspec:install'
 # Allow support files to be loaded
-gsub_file 'spec/rails_helper.rb', /# Dir\[Rails\.root\.join/, 'Dir[Rails.root.join'
+# gsub_file 'spec/rails_helper.rb', /# Dir\[Rails\.root\.join/, 'Dir[Rails.root.join'
 # Remove test folder
 run 'rm -rf test/'
 
@@ -209,7 +231,7 @@ end
 
 # Ember Deployment (ember-cli-rails)
 inside "#{ember_app}" do
-  run 'ember install ember-cli-rails-addon@0.7.0'
+  run 'ember install ember-cli-rails-addon@0.8.0'
 end
 
 run "mkdir #{ember_app}/app/adapters/"
@@ -239,15 +261,16 @@ run 'rails g api_me:policy user username email password password_confirmation'
 
 # Ember part
 inside "#{ember_app}" do
-  run 'ember install ember-cli-sass'
-  run 'ember install ember-cli-bootstrap-sassy'
-  run 'ember install ember-freestyle'
-  run 'ember install torii'
+  run 'ember install ember-cli-sass@~7.0.0'
+  run 'ember install ember-cli-bootstrap-sassy@~0.5.6'
+  run 'ember install torii@~0.9.6'
+  run 'ember install ember-bootstrap@1.0.0-rc.2'
+  run 'ember generate ember-bootstrap --bootstrap-version=4' if yes?("Use bootstrap 4 instead of 3?")
 
-  run 'npm install --save-dev wildland/ember-bootstrap-controls#v0.12.0'
+  run 'npm install --save-dev wildland/ember-bootstrap-controls#v0.15.1'
   run 'ember g ember-bootstrap-controls'
 
-  run 'npm install --save-dev wildland/ember-authenticate-me#v0.7.0'
+  run 'npm install --save-dev wildland/ember-authenticate-me#v0.8.0'
   run 'ember g ember-authenticate-me'
 
   run 'rm app/styles/app.css'
@@ -278,6 +301,10 @@ inject_into_file(
     }
 JS
 end
+
+run 'rails generate ember:heroku'
+
+gsub_file "#{ember_app}/app/styles/app.scss", "@import 'ember-freestyle';", ""
 
 git add: '.'
 git commit: "-m 'Project #{@app_name} initialized'"

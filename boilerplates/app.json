@@ -23,21 +23,6 @@
     "NPM_CONFIG_PRODUCTION": {
       "required": true
     },
-    "AWS_ACCESS_KEY_ID": {
-      "required": true
-    },
-    "AWS_S3_CACHE_BUCKET_NAME": {
-      "required": true
-    },
-    "AWS_S3_DOWNLOAD_BUCKET_NAME": {
-      "required": true
-    },
-    "AWS_REGION": {
-      "required": true
-    },
-    "AWS_SECRET_ACCESS_KEY": {
-      "required": true
-    },
     "WILDLAND_STATUS_BAR": "development"
   },
   "addons": [
