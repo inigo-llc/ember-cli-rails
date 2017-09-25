@@ -95,7 +95,7 @@ else
   gem 'squeel'
 end
 gem 'factory_girl_rails'
-gem 'mailcatcher'
+gem 'mailcatcher', groups: [:development]
 gem 'puma'
 gem "ember-cli-rails", '~> 0.10.0'
 gem 'active_model_serializers', '~> 0.10.6'
