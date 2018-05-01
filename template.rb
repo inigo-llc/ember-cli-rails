@@ -11,7 +11,7 @@
 require 'pry'
 ruby_version = '2.3.4'
 node_version = 'v6.11.3'
-rails_version = '4.2.7.1'
+rails_version = '4.2.10'
 ember_cli_version = '2.15.1'
 action_messages = []
 branch = 'master'
