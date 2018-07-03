@@ -8,11 +8,12 @@
 # This template assumes you have followed the setup guide at:
 # https://github.com/wildland/guides/#setting-up-your-development-enviroment
 #
-require 'pry'
-ruby_version = '2.3.4'
-node_version = 'v6.11.3'
-rails_version = '4.2.7.1'
-ember_cli_version = '2.15.1'
+ruby_version = '2.5.1'
+node_version = 'v8.11.3'
+rails_version = '4.2.10'
+ember_cli_version = '3.1.3'
+
+
 action_messages = []
 branch = 'master'
 ember_app = 'app-ember'
@@ -89,20 +90,15 @@ end
 
 gem 'pg'
 # Install Squeel
-if yes? ('Use baby_squeel instead of squeel?')
-  gem 'baby_squeel'
-else
-  gem 'squeel'
-end
-gem 'factory_girl_rails'
+gem 'baby_squeel'
+gem 'factory_bot_rails'
 gem 'mailcatcher', groups: [:development]
 gem 'puma'
-gem "ember-cli-rails", '~> 0.10.0'
+gem "ember-cli-rails"
 gem 'active_model_serializers', '~> 0.10.6'
 
 # Install development and test gems
 gem_group :development, :test do
-  gem 'wildland_dev_tools'
   gem 'annotate'
   gem 'brakeman'
   gem 'faker'
@@ -244,67 +240,42 @@ run "curl -o #{ember_app}/app/serializers/application.js 'https://raw.githubuser
 ###
 
 # api_me installation
-gem 'api_me', '~>0.8.2'
+gem 'api_me'
 run 'bundle install'
 run 'rails g api_me:install'
 
 # Token Authentication Installation and Setup (token_authenticate_me and ember-authenticate-me)
-gem 'token_authenticate_me', '~>0.6.0'
-run 'bundle install'
-run 'rails g token_authenticate_me:install'
-run 'bundle exec rake db:migrate'
+if yes? ('Do you need user authentication?')
+  gem 'token_authenticate_me'
+  run 'bundle install'
+  run 'rails g token_authenticate_me:install'
+  run 'bundle exec rake db:migrate'
 
-run 'rails g api_me:policy user username email password password_confirmation'
-#inject_into_class 'app/policies/user_policy.rb', UserPolicy do
-#  "  def create?\n    true\n  end\n"
-#end
+  run 'rails g api_me:policy user username email password password_confirmation'
+
+  inside "#{ember_app}" do
+    run 'ember install torii'
+    run 'ember install ember-authenticate-me' # This incompatibility with Ember 3 needs to be investigated.
+  end
+end
+
 
 # Ember part
 inside "#{ember_app}" do
-  run 'ember install ember-cli-sass@~7.0.0'
-  run 'ember install ember-cli-bootstrap-sassy@~0.5.6'
-  run 'ember install torii@~0.9.6'
-  run 'ember install ember-bootstrap@1.0.0-rc.2'
-  run 'ember generate ember-bootstrap --bootstrap-version=4' if yes?("Use bootstrap 4 instead of 3?")
+  run 'ember install ember-cli-sass'
+  run 'ember install ember-cli-bootstrap-4'
+  run 'ember install ember-freestyle'
+  inject_into_file 'app/router.js', after: "Router.map(function() {\n" do
+    "  this.route('freestyle', { path: '/' });\n"
+  end
 
-  run 'npm install --save-dev wildland/ember-bootstrap-controls#v0.15.1'
+  run 'npm install --save-dev wildland/ember-bootstrap-controls#v1.0.0-alpha.10'
   run 'ember g ember-bootstrap-controls'
-
-  run 'npm install --save-dev wildland/ember-authenticate-me#v0.8.0'
-  run 'ember g ember-authenticate-me'
-
-  run 'rm app/styles/app.css'
 end
 
-# Copy default app.scss file
-run "curl -o app-ember/app/styles/app.scss 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/app.scss'"
-run "touch app-ember/app/styles/_variables.scss"
 
-inject_into_file(
-  "#{ember_app}/ember-cli-build.js",
-  after: '// Add options here'
-) do
-<<-JS
-
-    'ember-bootstrap': {
-      importBootstrapFont: true,
-      importBootstrapCSS: false
-    },
-    emberAuthenticateMe: {
-      importCSS: true
-    },
-    'ember-power-select': {
-      theme: 'bootstrap'
-    },
-    babel: {
-      includePolyfill: true,
-    }
-JS
-end
 
 run 'rails generate ember:heroku'
-
-gsub_file "#{ember_app}/app/styles/app.scss", "@import 'ember-freestyle';", ""
 
 git add: '.'
 git commit: "-m 'Project #{@app_name} initialized'"
