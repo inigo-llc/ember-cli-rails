@@ -264,6 +264,7 @@ inside "#{ember_app}" do
   run 'ember install ember-cli-sass@~7.0.0'
   run 'ember install ember-cli-bootstrap-sassy@~0.5.6'
   run 'ember install torii@~0.9.6'
+  run 'ember install active-model-adapter@2.2.0'
   run 'ember install ember-bootstrap@1.0.0-rc.2'
   run 'ember generate ember-bootstrap --bootstrap-version=4' if yes?("Use bootstrap 4 instead of 3?")
 
