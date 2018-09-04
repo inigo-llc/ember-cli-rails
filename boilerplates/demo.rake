@@ -1,4 +1,4 @@
-require 'factory_girl'
+require 'factory_bot_rails'
 require 'faker'
 
 namespace :demo do
