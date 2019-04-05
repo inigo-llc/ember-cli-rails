@@ -8,10 +8,10 @@
 # This template assumes you have followed the setup guide at:
 # https://github.com/wildland/guides/#setting-up-your-development-enviroment
 #
-ruby_version = '2.5.1'
+ruby_version = '2.6.1'
 node_version = 'v8.11.3'
-rails_version = '4.2.10'
-ember_cli_version = '3.1.3'
+rails_version = '5.2.2.1'
+ember_cli_version = '3.8.1'
 
 
 action_messages = []
@@ -37,6 +37,8 @@ end
 git :init
 git add: '.'
 git commit: "-m 'Initial commit.'"
+
+run "curl -o .gitignore 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/gitignore'"
 
 # Download the most recent gitignore boilerplate
 run "curl -o .gitignore 'https://raw.githubusercontent.com/wildland/trailhead/#{branch}/boilerplates/gitignore'"
@@ -67,14 +69,7 @@ end
 
 run "sed -i.bak '/jbuilder/d' Gemfile"
 
-run "sed -i.bak '/sass-rails/d' Gemfile"
-run "sed -i.bak '/Use SCSS/d' Gemfile"
-
-run "sed -i.bak '/uglifier/d' Gemfile"
-run "sed -i.bak '/Use Uglifier/d' Gemfile"
-
-run "sed -i.bak '/turbolinks/d' Gemfile"
-run "sed -i.bak '/Turbolinks makes/d' Gemfile"
+run "sed -i.bak '/tzinfo-data/d' Gemfile"
 
 # cleanup
 run 'rm Gemfile.bak'
@@ -83,19 +78,19 @@ inject_into_file 'Gemfile', after: "source 'https://rubygems.org'" do
   "\ngem 'dotenv-rails', groups: [:development, :test], require: 'dotenv/rails-now'"
 end
 
-# Install production gems
-gem_group :production do
-  gem 'rails_12factor'
-end
 
-gem 'pg'
-# Install Squeel
-gem 'baby_squeel'
-gem 'factory_bot_rails'
-gem 'mailcatcher', groups: [:development]
-gem 'puma'
+run 'bundle add factory_bot_rails'
+# Require false
+run 'bundle add factory_bot_rails'
+# Require false
+
+gem 'puma-heroku'
+# config
+
+gem 'active_model_serializers'
+
 gem "ember-cli-rails"
-gem 'active_model_serializers', '~> 0.10.6'
+
 
 # Install development and test gems
 gem_group :development, :test do
